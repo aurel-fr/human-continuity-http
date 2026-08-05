@@ -17,6 +17,8 @@ keyword:
   - http message signatures
 
 venue:
+  group: HTTP
+  type: Working Group
   github: aurel-fr/human-continuity-http
   latest: https://aurel-fr.github.io/human-continuity-http/draft-brezun-human-continuity-http.html
   mail: ietf-http-wg@w3.org
