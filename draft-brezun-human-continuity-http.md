@@ -1472,6 +1472,8 @@ Signature coverage: HTTP Message Signatures protect only covered components. If 
 
 Request content: If Content-Digest is present on a holder-bound request, the signature input MUST cover the `content-digest` component. If request content matters to the attestation decision, the applicable profile SHOULD require Content-Digest coverage.
 
+Metadata fetching: Realm origins and other URLs obtained from fetched metadata are untrusted and are subject to the destination-validation and credential-handling requirements in {{metadata-precedence}}.
+
 Metadata freshness: Stale metadata can cause clients or verifiers to use retired realms, verification material, trust anchors, profiles, or policies. Profiles and origins SHOULD define metadata freshness and refresh behavior. Origins SHOULD send explicit freshness directives, such as Cache-Control with max-age, on policy metadata responses, on the 404 or 410 responses that establish policy absence, and on realm metadata responses. Clients SHOULD NOT apply heuristic caching to these documents; absent explicit freshness directives, a client SHOULD revalidate before relying on them.
 
 Realm operator trust material compromise and rotation: Compromise of realm operator trust material can allow forged artifacts or false `continuity_handle` values. This risk applies to every form of verification material and trust anchor a profile uses, including keys, circuits, contracts, ledger state, accumulator roots, and transparency logs. The lifecycle requirements for verification material in {{profile-requirements}}, together with profile-defined revocation or invalidation behavior where applicable, bound the exposure window.
