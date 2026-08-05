@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/human-continuity-policy-metadata.schema.json",
+  "title": "Human Continuity Policy Metadata",
+  "description": "Informative schema for the policy metadata document defined by draft-brezun-human-continuity-http. Not part of the protocol contract: where this schema and the draft's normative prose disagree, the prose prevails.",
+  "type": "object",
+  "required": [
+    "origin",
+    "default_policy_selectors",
+    "policy_selectors",
+    "policies"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "origin": {
+      "type": "string",
+      "format": "uri"
+    },
+    "default_policy_selectors": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/method_token"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/policy_identifier"
+      }
+    },
+    "policy_selectors": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/method_token"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/path_pattern"
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/policy_identifier"
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/policy_identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/policy_definition"
+      }
+    }
+  },
+  "$defs": {
+    "policy_definition": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "purposes"
+      ],
+      "properties": {
+        "purposes": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/purpose_entry_name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/purpose_entry"
+          }
+        }
+      }
+    },
+    "path_pattern": {
+      "type": "string",
+      "pattern": "^/(?!$)(?!/)(?!\\*\\*$)(?!\\.well-known/)(?!\\.\\.?(?:/|$))(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)(?:[^*]|/(?!\\*))*?(?:/\\*\\*)?$"
+    },
+    "method_token": {
+      "type": "string",
+      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+    },
+    "policy_identifier": {
+      "type": "string",
+      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+    },
+    "purpose_entry": {
+      "type": "object",
+      "required": [
+        "realm",
+        "profiles"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "realm": {
+          "type": "string",
+          "format": "uri"
+        },
+        "profiles": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/profile_identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/profile_entry"
+          }
+        }
+      }
+    },
+    "purpose_entry_name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+    },
+    "profile_identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+    },
+    "profile_entry": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "presentation_assurances": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
