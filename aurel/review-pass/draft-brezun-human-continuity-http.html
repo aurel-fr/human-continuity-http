@@ -2521,7 +2521,7 @@ https://realm.example/.well-known/human-continuity-realm
 <a href="#section-11.3.4" class="section-number selfRef">11.3.4. </a><a href="#name-security-boundary" class="section-name selfRef">Security Boundary</a>
           </h4>
 <p id="section-11.3.4-1">Challenge binding establishes freshness at challenge granularity; replay keys prevent repeated acceptance; per-human policy operates separately on <code>continuity_handle</code>. Holder-bound presentations sign the components required by <a href="#message-signature-requirements" class="auto internal xref">Section 11.2</a>. This specification defines no equivalent request binding for bearer presentations.<a href="#section-11.3.4-1" class="pilcrow">¶</a></p>
-<p id="section-11.3.4-2">A validated challenge proves only that the profile used the verifier nonce. If presentation-assurance is requested, the profile <span class="bcp14">MUST</span> bind its evidence to the profile, effective realm, effective attestation audience, purpose, and nonce. Without that parameter, this document requests no additional presentation assurance.<a href="#section-11.3.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.3.4-2">A validated challenge proves only that the profile used the verifier nonce. Evidence for any requested or asserted presentation-assurance value <span class="bcp14">MUST</span> be bound to the profile, effective realm, effective attestation audience, purpose, and challenge nonce. If the challenge omits presentation-assurance, this document requests no additional presentation assurance.<a href="#section-11.3.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
