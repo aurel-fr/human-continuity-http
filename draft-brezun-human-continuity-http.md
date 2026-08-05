@@ -1167,7 +1167,7 @@ Replay state, and any nonce state or key material it depends on, MUST remain ava
 
 Challenge binding establishes freshness at challenge granularity; replay keys prevent repeated acceptance; per-human policy operates separately on `continuity_handle`. Holder-bound presentations sign the components required by {{message-signature-requirements}}. This specification defines no equivalent request binding for bearer presentations.
 
-A validated challenge proves only that the profile used the verifier nonce. If presentation-assurance is requested, the profile MUST bind its evidence to the profile, effective realm, effective attestation audience, purpose, and nonce. Without that parameter, this document requests no additional presentation assurance.
+A validated challenge proves only that the profile used the verifier nonce. Evidence for any requested or asserted presentation-assurance value MUST be bound to the profile, effective realm, effective attestation audience, purpose, and challenge nonce. If the challenge omits presentation-assurance, this document requests no additional presentation assurance.
 
 ## Request Content Binding
 
