@@ -1813,6 +1813,8 @@ https://service.example/accounts/free-tier
 <p id="section-6.4-29">HTTP field in the response:<a href="#section-6.4-29" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-30">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="site_rate_limit"; \
   challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
@@ -1884,6 +1886,8 @@ https://api.example.com/graphql
 <p id="section-6.4-47">HTTP field in the response:<a href="#section-6.4-47" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-48">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="promo:summer-sale"; \
   challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -1936,6 +1940,8 @@ subject-present
 <p id="section-6.4-54">Continuity scope:<a href="#section-6.4-54" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-55">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 (https://realm.example, https://api.example.com, \
   promo:summer-sale)
 </pre><a href="#section-6.4-55" class="pilcrow">¶</a>
@@ -1943,6 +1949,8 @@ subject-present
 <p id="section-6.4-56">When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:<a href="#section-6.4-56" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-57">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 POST /graphql HTTP/1.1
 Host: api.example.com
 Content-Type: application/json
@@ -1988,6 +1996,8 @@ Signature: hu=:bidcWjspV0fNiGmSb4/Gz1YNNOovQ6x1vykhJqOlMOGEpMw89IZz\
 <p id="section-7.1-5">Example:<a href="#section-7.1-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.1-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:MB0QuNph5ynfuWXZOJTIzTUIHQ9+puFvDSseCAUBY0s=:
@@ -2017,6 +2027,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-7.2-12">Example:<a href="#section-7.2-12" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.2-13">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -2043,6 +2055,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-7.3-8">Example:<a href="#section-7.3-8" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.3-9">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"
@@ -2708,6 +2722,8 @@ Access-Control-Expose-Headers: Human-Continuity-Challenge
 <p id="section-15-4">CORS preflight responses need to allow the actual request's method and fields:<a href="#section-15-4" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-15-5">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Access-Control-Allow-Methods: GET, POST
 Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
   Signature, Content-Digest
@@ -2978,6 +2994,8 @@ https://service.example/api/quota
 <p id="section-22.1-3">The origin challenges on the response to the first request:<a href="#section-22.1-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.1-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -2989,6 +3007,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-22.1-5">The client retries with a presentation bound to the challenge nonce:<a href="#section-22.1-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.1-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 GET /api/quota HTTP/1.1
 Host: service.example
 Human-Continuity: "com.example.unique-human.v1"; \
@@ -3043,6 +3063,8 @@ https://service.example/accounts/free-tier
 <p id="section-22.2-3">The origin can return:<a href="#section-22.2-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.2-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -3055,6 +3077,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-22.2-5">The origin sends this challenge before creating the account, allocating the free tier, or applying any other signup effect. The client then checks policy metadata before treating the purpose, profile, and presentation-assurance value as authorized. With the Policy Metadata example below, POST /accounts/free-tier selects the signup policy, which authorizes the challenge. The client can then repeat the not-yet-applied signup operation with a holder-bound presentation:<a href="#section-22.2-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.2-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 POST /accounts/free-tier HTTP/1.1
 Host: service.example
 Authorization: Bearer account-native-token
@@ -3408,6 +3432,8 @@ human_agent_delegations (
 <p id="appendix-A-3">Example challenge:<a href="#appendix-A-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="appendix-A-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
@@ -3417,6 +3443,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="appendix-A-5">Example presentation:<a href="#appendix-A-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="appendix-A-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"; \

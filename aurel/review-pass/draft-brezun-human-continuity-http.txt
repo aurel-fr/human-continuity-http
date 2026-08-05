@@ -995,6 +995,8 @@ Table of Contents
 
    HTTP field in the response:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="site_rate_limit"; \
      challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
@@ -1054,6 +1056,8 @@ Table of Contents
 
    HTTP field in the response:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="promo:summer-sale"; \
      challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -1112,11 +1116,15 @@ Table of Contents
 
    Continuity scope:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    (https://realm.example, https://api.example.com, \
      promo:summer-sale)
 
    When the client retries an operation-specific request with content,
    it includes request content coverage in the HTTP Message Signature:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    POST /graphql HTTP/1.1
    Host: api.example.com
@@ -1159,6 +1167,8 @@ Table of Contents
    profile identifier.
 
    Example:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="free_tier_signup"; \
@@ -1247,6 +1257,8 @@ Table of Contents
 
    Example:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 409 Conflict
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -1283,6 +1295,8 @@ Table of Contents
    combined field value is therefore invalid.
 
    Example:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity: "com.example.unique-human.v1"; \
      artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
@@ -2626,6 +2640,8 @@ Table of Contents
    CORS preflight responses need to allow the actual request's method
    and fields:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Access-Control-Allow-Methods: GET, POST
    Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
      Signature, Content-Digest
@@ -3205,6 +3221,8 @@ Table of Contents
 
    The origin challenges on the response to the first request:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 429 Too Many Requests
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -3213,6 +3231,8 @@ Table of Contents
      challenge=:u5ytp8jYXgfXmZKNrsllkJt2MH8sWQHIi5UJYyI+VFc=:
 
    The client retries with a presentation bound to the challenge nonce:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    GET /api/quota HTTP/1.1
    Host: service.example
@@ -3256,6 +3276,8 @@ Table of Contents
 
    The origin can return:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 409 Conflict
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -3272,6 +3294,8 @@ Table of Contents
    signup policy, which authorizes the challenge.  The client can then
    repeat the not-yet-applied signup operation with a holder-bound
    presentation:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    POST /accounts/free-tier HTTP/1.1
    Host: service.example
@@ -3621,12 +3645,16 @@ Appendix A.  Illustrative Profile Sketch
 
    Example challenge:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="free_tier_signup"; \
      challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
      presentation-assurance="subject-present"
 
    Example presentation:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity: "com.example.unique-human.v1"; \
      artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
