@@ -1702,7 +1702,6 @@ The challenge above carried a challenge nonce. The challenge nonce evidence requ
   }
 }
 ~~~
-{: sourcecode-markers="true"}
 
 ## Realm Metadata
 
