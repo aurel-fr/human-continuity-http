@@ -1,3 +1,5 @@
+export UPLOAD_EMAIL ?= aurelien.brezun@toolsforhumanity.com
+
 LIBDIR := lib
 -include $(LIBDIR)/main.mk
 
