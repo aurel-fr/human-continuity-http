@@ -3322,7 +3322,6 @@ Table of Contents
 
 22.3.  Policy Metadata
 
-   <CODE BEGINS>
    {
      "origin": "https://service.example",
      "default_policy_selectors": {
@@ -3375,7 +3374,6 @@ Table of Contents
        }
      }
    }
-   <CODE ENDS>
 
 22.4.  Realm Metadata
 
