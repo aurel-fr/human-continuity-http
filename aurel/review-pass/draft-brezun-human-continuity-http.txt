@@ -3050,6 +3050,10 @@ Table of Contents
    If request content matters to the attestation decision, the
    applicable profile SHOULD require Content-Digest coverage.
 
+   Metadata fetching: Realm origins and other URLs obtained from fetched
+   metadata are untrusted and are subject to the destination-validation
+   and credential-handling requirements in Section 8.5.
+
    Metadata freshness: Stale metadata can cause clients or verifiers to
    use retired realms, verification material, trust anchors, profiles,
    or policies.  Profiles and origins SHOULD define metadata freshness
