@@ -2,12 +2,16 @@ name: "Validate Metadata Examples"
 
 on:
   push:
+    branches:
+      - main
     paths:
       - draft-*.md
       - schemas/**
       - scripts/validate-metadata-examples.py
       - .github/workflows/schemas.yml
   pull_request:
+    branches:
+      - main
     paths:
       - draft-*.md
       - schemas/**
