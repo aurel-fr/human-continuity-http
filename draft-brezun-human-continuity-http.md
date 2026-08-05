@@ -468,6 +468,8 @@ https://service.example/accounts/free-tier
 HTTP field in the response:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="site_rate_limit"; \
   challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
@@ -541,6 +543,8 @@ https://api.example.com/graphql
 HTTP field in the response:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="promo:summer-sale"; \
   challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -594,6 +598,8 @@ subject-present
 Continuity scope:
 
 ~~~ text
+NOTE: '\' line wrapping per RFC 8792
+
 (https://realm.example, https://api.example.com, \
   promo:summer-sale)
 ~~~
@@ -601,6 +607,8 @@ Continuity scope:
 When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 POST /graphql HTTP/1.1
 Host: api.example.com
 Content-Type: application/json
@@ -640,6 +648,8 @@ Each Human-Continuity-Challenge list member value and the Human-Continuity item 
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:MB0QuNph5ynfuWXZOJTIzTUIHQ9+puFvDSseCAUBY0s=:
@@ -678,6 +688,8 @@ A Human-Continuity-Challenge list member MUST include the challenge parameter. A
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -706,6 +718,8 @@ A verifier MUST parse the Human-Continuity field value as a Structured Field Ite
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"
@@ -1329,6 +1343,8 @@ Access-Control-Expose-Headers: Human-Continuity-Challenge
 CORS preflight responses need to allow the actual request's method and fields:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Access-Control-Allow-Methods: GET, POST
 Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
   Signature, Content-Digest
@@ -1528,6 +1544,8 @@ https://service.example/api/quota
 The origin challenges on the response to the first request:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -1539,6 +1557,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 The client retries with a presentation bound to the challenge nonce:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 GET /api/quota HTTP/1.1
 Host: service.example
 Human-Continuity: "com.example.unique-human.v1"; \
@@ -1589,6 +1609,8 @@ https://service.example/accounts/free-tier
 The origin can return:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -1601,6 +1623,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 The origin sends this challenge before creating the account, allocating the free tier, or applying any other signup effect. The client then checks policy metadata before treating the purpose, profile, and presentation-assurance value as authorized. With the Policy Metadata example below, POST /accounts/free-tier selects the signup policy, which authorizes the challenge. The client can then repeat the not-yet-applied signup operation with a holder-bound presentation:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 POST /accounts/free-tier HTTP/1.1
 Host: service.example
 Authorization: Bearer account-native-token
@@ -1772,6 +1796,8 @@ The example profile "com.example.unique-human.v1" is fictional. It defines an op
 Example challenge:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
@@ -1781,6 +1807,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 Example presentation:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"; \
