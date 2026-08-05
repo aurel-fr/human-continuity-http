@@ -42,7 +42,7 @@ About This Document
    http.html.  Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-brezun-human-continuity-http/.
 
-   Discussion of this document takes place on the ietf-http-wg Group
+   Discussion of this document takes place on the HTTP Working Group
    mailing list (mailto:ietf-http-wg@w3.org), which is archived at
    https://lists.w3.org/Archives/Public/ietf-http-wg/.
 
