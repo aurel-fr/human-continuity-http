@@ -1,0 +1,66 @@
+name: "Publish New Draft Version"
+
+on:
+  push:
+    tags:
+      - "draft-*"
+  workflow_dispatch:
+    inputs:
+      email:
+        description: "Submitter email"
+        default: ""
+        type: string
+
+jobs:
+  build:
+    name: "Publish New Draft Version"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          # Needed for tracing file history for replacement status
+          fetch-depth: 0
+          fetch-tags: true
+
+      # See https://github.com/actions/checkout/issues/290
+      - name: "Get Tag Annotations"
+        run: git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+
+      - name: "Setup"
+        id: setup
+        run: date -u "+date=%FT%T" >>"$GITHUB_OUTPUT"
+
+      - name: "Caching"
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            .refcache
+            .venv
+            .gems
+            node_modules
+            .targets.mk
+          key: i-d-${{ steps.setup.outputs.date }}
+          restore-keys: i-d-
+
+      - name: "Build Drafts"
+        id: build
+        uses: martinthomson/i-d-template@93f76f1de3bd604f9f495c44aacc01d232dc82b5 # v1
+        with:
+          make: releases
+          token: ${{ github.token }}
+
+      - name: "Upload to Datatracker"
+        uses: martinthomson/i-d-template@93f76f1de3bd604f9f495c44aacc01d232dc82b5 # v1
+        with:
+          make: upload
+        env:
+          UPLOAD_EMAIL: ${{ inputs.email }}
+          GITHUB_STEP: upload
+
+      - name: "Archive Submitted Drafts"
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: always() && steps.build.outcome == 'success'
+        with:
+          name: published
+          path: "versioned/draft-*-[0-9][0-9].*"

@@ -1,0 +1,45 @@
+name: "Archive Issues and Pull Requests"
+
+on:
+  schedule:
+    - cron: "0 0 * * 0,2,4"
+  repository_dispatch:
+    types: [archive]
+  workflow_dispatch:
+    inputs:
+      archive_full:
+        description: "Recreate the archive from scratch"
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: "Archive Issues and Pull Requests"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: "Update Archive"
+        uses: martinthomson/i-d-template@93f76f1de3bd604f9f495c44aacc01d232dc82b5 # v1
+        env:
+          ARCHIVE_FULL: ${{ inputs.archive_full }}
+        with:
+          make: archive
+          token: ${{ github.token }}
+
+      - name: "Update GitHub Pages"
+        uses: martinthomson/i-d-template@93f76f1de3bd604f9f495c44aacc01d232dc82b5 # v1
+        with:
+          make: gh-archive
+          token: ${{ github.token }}
+
+      - name: "Save Archive"
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: archive
+          path: archive.json
