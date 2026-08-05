@@ -1432,7 +1432,7 @@ Holder key compromise: If a holder key and its bound artifact are compromised, a
 
 Request binding: Holder signatures cover `@method`, `@target-uri`, and Human-Continuity. This specification defines no equivalent binding for bearer presentations.
 
-Authenticated principals: Neither the challenge context nor mandatory signature coverage includes Authorization, session, or application principal. Whether and how a `continuity_handle` is associated with a principal is origin policy ({{verifier-behavior}}).
+Authenticated principals: The challenge context and mandatory signature coverage do not bind a presentation to Authorization, a session, or an application principal. Before linking a `continuity_handle` to a principal, an origin SHOULD either record that principal with the challenge nonce and require the same principal on presentation, or require signature coverage of the request fields used for authentication ({{verifier-behavior}}). Single-use acceptance limits replay but does not provide principal binding ({{freshness-replay}}).
 
 State exhaustion: Required replay and mutable nonce state MUST remain available through its retention deadline. Capacity, partition, or backend failures MUST fail closed as `unverifiable`. Verifiers SHOULD bound lifetimes, rate-limit issuance and verification, and provision replay storage for their acceptance modes.
 
