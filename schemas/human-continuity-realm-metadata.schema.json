@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/human-continuity-realm-metadata.schema.json",
+  "title": "Human Continuity Realm Metadata",
+  "description": "Informative schema for the realm metadata document defined by draft-brezun-human-continuity-http. Not part of the protocol contract: where this schema and the draft's normative prose disagree, the prose prevails.",
+  "type": "object",
+  "required": [
+    "realm",
+    "profiles"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "realm": {
+      "type": "string",
+      "format": "uri"
+    },
+    "profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/profile_identifier"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "issuance_endpoint": {
+            "type": "string",
+            "format": "uri"
+          },
+          "max_artifact_size_issued": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "profile_identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+    }
+  }
+}
