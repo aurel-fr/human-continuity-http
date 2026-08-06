@@ -1,0 +1,111 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-08-06T02:22:27.270913+00:00",
+  "repo": "aurel-fr/human-continuity-http",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOTuLynM77NBpf",
+      "title": "docs: schemas and applicability rationale",
+      "url": "https://github.com/aurel-fr/human-continuity-http/pull/1",
+      "state": "MERGED",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-05T17:36:11Z",
+      "updatedAt": "2026-08-05T17:47:40Z",
+      "baseRepository": "aurel-fr/human-continuity-http",
+      "baseRefName": "main",
+      "baseRefOid": "c5e9d6c3a25b4e956dd8ad6aced32808084ef406",
+      "headRepository": "aurel-fr/human-continuity-http",
+      "headRefName": "aurel/docs",
+      "headRefOid": "5dff7fe4f0f34e63692caeabcce747485d3532d2",
+      "closedAt": "2026-08-05T17:47:40Z",
+      "mergedAt": "2026-08-05T17:47:40Z",
+      "mergedBy": "aurel-fr",
+      "mergeCommit": {
+        "oid": "783b2cd96e3cfe9346c3e62264eba891daf8a0bd"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOTuLynM77Vygt",
+      "title": "Pre-submission review fixes for -00",
+      "url": "https://github.com/aurel-fr/human-continuity-http/pull/2",
+      "state": "MERGED",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": " ## Summary\r\n\r\n  - Aligns Security Considerations with mandatory `human-continuity` signature coverage.\r\n  - Adds principal-association guidance and binds requested or asserted presentation-assurance evidence to the continuity scope and challenge nonce.\r\n  - Clarifies which metadata fetches prohibit cross-origin redirects.\r\n  - Fixes HTTP WG metadata, terminology, examples, security cross-references, and source-code markers.\r\n  - Tightens purpose-template schema validation.\r\n  - Hardens the publishing workflow against expression injection and limits it to `contents: read`.\r\n  - Fixes contributor guidance and a validator comment.",
+      "createdAt": "2026-08-06T00:07:44Z",
+      "updatedAt": "2026-08-06T00:22:19Z",
+      "baseRepository": "aurel-fr/human-continuity-http",
+      "baseRefName": "main",
+      "baseRefOid": "783b2cd96e3cfe9346c3e62264eba891daf8a0bd",
+      "headRepository": "aurel-fr/human-continuity-http",
+      "headRefName": "aurel/review-pass",
+      "headRefOid": "d763cb92015e83b9f1a2255aba264a2214f1d2d3",
+      "closedAt": "2026-08-06T00:22:17Z",
+      "mergedAt": "2026-08-06T00:22:17Z",
+      "mergedBy": "aurel-fr",
+      "mergeCommit": {
+        "oid": "20e9c2f377619d2d7b5ad9bf8ccaec4ba55bc572"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
