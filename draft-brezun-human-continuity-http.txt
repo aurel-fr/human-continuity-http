@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                           5 August 2026
-Expires: 6 February 2027
+Intended status: Standards Track                           6 August 2026
+Expires: 7 February 2027
 
 
                        Human Continuity for HTTP
@@ -42,7 +42,7 @@ About This Document
    http.html.  Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-brezun-human-continuity-http/.
 
-   Discussion of this document takes place on the ietf-http-wg Group
+   Discussion of this document takes place on the HTTP Working Group
    mailing list (mailto:ietf-http-wg@w3.org), which is archived at
    https://lists.w3.org/Archives/Public/ietf-http-wg/.
 
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 February 2027.
+   This Internet-Draft will expire on 7 February 2027.
 
 Copyright Notice
 
@@ -509,6 +509,10 @@ Table of Contents
    parameter of Human-Continuity-Challenge (Section 7.4) and bound by
    the selected profile according to Section 11.3.  A challenge nonce is
    distinct from the nonce signature parameter defined by [RFC9421].
+
+   Challenge context: The profile, effective realm, effective
+   attestation audience, purpose, and requested presentation-assurance
+   value, if any, for which a challenge nonce was issued (Section 11.3).
 
    Subject: The verified human that an artifact attests as unique; the
    human claimed to be a unique human.
@@ -980,12 +984,13 @@ Table of Contents
    The examples below show the exchange first, then the policy metadata
    checked to derive the effective values.  The abbreviated metadata is
    complete for the shown request method and path, with unrelated non-
-   matching entries omitted.  Example artifact values are illustrative
-   placeholders: a real artifact is bound to one effective realm,
-   effective attestation audience, and purpose, and the same artifact
-   bytes would not be valid across the different continuity scopes shown
-   in this document's examples.  Additional end-to-end flows against a
-   consolidated policy metadata document are shown in Section 22.
+   matching entries omitted.  Example artifact and Signature values are
+   illustative placeholders.  A real artifact is bound to one effective
+   realm, effective attestation audience, and purpose, and the same
+   artifact bytes would not be valid across the different continuity
+   scopes shown in this document's examples.  Additional end-to-end
+   flows against a consolidated policy metadata document are shown in
+   Section 22.
 
    Example 1: default policy selector with origin-scoped policy
 
@@ -994,6 +999,8 @@ Table of Contents
    https://service.example/accounts/free-tier
 
    HTTP field in the response:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="site_rate_limit"; \
@@ -1054,6 +1061,8 @@ Table of Contents
 
    HTTP field in the response:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="promo:summer-sale"; \
      challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -1112,11 +1121,12 @@ Table of Contents
 
    Continuity scope:
 
-   (https://realm.example, https://api.example.com, \
-     promo:summer-sale)
+   (https://realm.example, https://api.example.com, promo:summer-sale)
 
    When the client retries an operation-specific request with content,
    it includes request content coverage in the HTTP Message Signature:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    POST /graphql HTTP/1.1
    Host: api.example.com
@@ -1159,6 +1169,8 @@ Table of Contents
    profile identifier.
 
    Example:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="free_tier_signup"; \
@@ -1247,6 +1259,8 @@ Table of Contents
 
    Example:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 409 Conflict
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -1283,6 +1297,8 @@ Table of Contents
    combined field value is therefore invalid.
 
    Example:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity: "com.example.unique-human.v1"; \
      artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
@@ -1686,8 +1702,9 @@ Table of Contents
    A fetched document MUST NOT be used as policy metadata or realm
    metadata unless the response of the fetch has status code 200 and the
    media type required for that document, matching metadata retrieval in
-   [RFC9728].  Core metadata fetches MUST NOT follow cross-origin
-   redirects, which do not establish policy absence (Section 6.2).
+   [RFC9728].  Policy metadata fetches and realm metadata fetches using
+   this document's well-known mechanism MUST NOT follow cross-origin
+   redirects.
 
    Realm origins and other URLs obtained from fetched metadata are
    untrusted.  Unless trusted local configuration authorizes the exact
@@ -2326,10 +2343,11 @@ Table of Contents
    equivalent request binding for bearer presentations.
 
    A validated challenge proves only that the profile used the verifier
-   nonce.  If presentation-assurance is requested, the profile MUST bind
-   its evidence to the profile, effective realm, effective attestation
-   audience, purpose, and nonce.  Without that parameter, this document
-   requests no additional presentation assurance.
+   nonce.  Evidence for any requested or asserted presentation-assurance
+   value MUST be bound to the profile, effective realm, effective
+   attestation audience, purpose, and challenge nonce.  If the challenge
+   omits presentation-assurance, this document requests no additional
+   presentation assurance.
 
 11.4.  Request Content Binding
 
@@ -2624,6 +2642,8 @@ Table of Contents
 
    CORS preflight responses need to allow the actual request's method
    and fields:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Access-Control-Allow-Methods: GET, POST
    Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
@@ -2938,10 +2958,14 @@ Table of Contents
    Human-Continuity.  This specification defines no equivalent binding
    for bearer presentations.
 
-   Authenticated principals: Neither the challenge context nor mandatory
-   signature coverage includes Authorization, session, or application
-   principal.  Whether and how a continuity_handle is associated with a
-   principal is origin policy (Section 13).
+   Authenticated principals: The challenge context and mandatory
+   signature coverage do not bind a presentation to Authorization, a
+   session, or an application principal.  Before linking a
+   continuity_handle to a principal, an origin SHOULD either record that
+   principal with the challenge nonce and require the same principal on
+   presentation, or require signature coverage of the request fields
+   used for authentication (Section 13).  Single-use acceptance limits
+   replay but does not provide principal binding (Section 11.3).
 
    State exhaustion: Required replay and mutable nonce state MUST remain
    available through its retention deadline.  Capacity, partition, or
@@ -3017,8 +3041,8 @@ Table of Contents
    effective realm, or effective attestation audience, and they do not
    broaden authorized purposes, profile choices, or presentation-
    assurance values authorized by policy metadata.  Holder-bound
-   presentations SHOULD cover Human-Continuity in the HTTP Message
-   Signature.
+   presentations cover Human-Continuity in the HTTP Message Signature
+   (Section 11.2).
 
    Signature coverage: HTTP Message Signatures protect only covered
    components.  If a component is not covered, a verifier MUST NOT claim
@@ -3028,6 +3052,10 @@ Table of Contents
    request, the signature input MUST cover the content-digest component.
    If request content matters to the attestation decision, the
    applicable profile SHOULD require Content-Digest coverage.
+
+   Metadata fetching: Realm origins and other URLs obtained from fetched
+   metadata are untrusted and are subject to the destination-validation
+   and credential-handling requirements in Section 8.5.
 
    Metadata freshness: Stale metadata can cause clients or verifiers to
    use retired realms, verification material, trust anchors, profiles,
@@ -3200,6 +3228,8 @@ Table of Contents
 
    The origin challenges on the response to the first request:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 429 Too Many Requests
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -3208,6 +3238,8 @@ Table of Contents
      challenge=:u5ytp8jYXgfXmZKNrsllkJt2MH8sWQHIi5UJYyI+VFc=:
 
    The client retries with a presentation bound to the challenge nonce:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    GET /api/quota HTTP/1.1
    Host: service.example
@@ -3251,6 +3283,8 @@ Table of Contents
 
    The origin can return:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    HTTP/1.1 409 Conflict
    Content-Type: application/problem+json
    Cache-Control: no-store
@@ -3267,6 +3301,8 @@ Table of Contents
    signup policy, which authorizes the challenge.  The client can then
    repeat the not-yet-applied signup operation with a holder-bound
    presentation:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    POST /accounts/free-tier HTTP/1.1
    Host: service.example
@@ -3293,7 +3329,6 @@ Table of Contents
 
 22.3.  Policy Metadata
 
-   <CODE BEGINS>
    {
      "origin": "https://service.example",
      "default_policy_selectors": {
@@ -3346,7 +3381,6 @@ Table of Contents
        }
      }
    }
-   <CODE ENDS>
 
 22.4.  Realm Metadata
 
@@ -3616,12 +3650,16 @@ Appendix A.  Illustrative Profile Sketch
 
    Example challenge:
 
+   NOTE: '\' line wrapping per RFC 8792
+
    Human-Continuity-Challenge: "com.example.unique-human.v1"; \
      purpose="free_tier_signup"; \
      challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
      presentation-assurance="subject-present"
 
    Example presentation:
+
+   NOTE: '\' line wrapping per RFC 8792
 
    Human-Continuity: "com.example.unique-human.v1"; \
      artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \

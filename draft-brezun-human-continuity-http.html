@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Brezun</td>
-<td class="center">Expires 6 February 2027</td>
+<td class="center">Expires 7 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-brezun-human-continuity-http-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-05" class="published">5 August 2026</time>
+<time datetime="2026-08-06" class="published">6 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-06">6 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-07">7 February 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1095,7 +1095,7 @@ svg {
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-brezun-human-continuity-http/">https://datatracker.ietf.org/doc/draft-brezun-human-continuity-http/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        ietf-http-wg Group mailing list (<span><a href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a></span>),
+        HTTP Working Group mailing list (<span><a href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a></span>),
         which is archived at <span><a href="https://lists.w3.org/Archives/Public/ietf-http-wg/">https://lists.w3.org/Archives/Public/ietf-http-wg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
         <span><a href="https://github.com/aurel-fr/human-continuity-http">https://github.com/aurel-fr/human-continuity-http</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
@@ -1119,7 +1119,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1528,13 +1528,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-2-18">Policy identifier: An origin-local token that names a policy definition in policy metadata. A policy identifier is selected for a request path and method.<a href="#section-2-18" class="pilcrow">¶</a></p>
 <p id="section-2-19">Policy selector: A policy metadata mapping that maps request path patterns for one HTTP method to policy identifiers.<a href="#section-2-19" class="pilcrow">¶</a></p>
 <p id="section-2-20">Challenge nonce: A verifier-generated value carried in the challenge parameter of Human-Continuity-Challenge (<a href="#common-field-parameters" class="auto internal xref">Section 7.4</a>) and bound by the selected profile according to <a href="#freshness-replay" class="auto internal xref">Section 11.3</a>. A challenge nonce is distinct from the <code>nonce</code> signature parameter defined by <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>.<a href="#section-2-20" class="pilcrow">¶</a></p>
-<p id="section-2-21">Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.<a href="#section-2-21" class="pilcrow">¶</a></p>
-<p id="section-2-22">Holder: The party that controls the use of an artifact in presentations. The holder can be the subject, or a client or agent acting for a human.<a href="#section-2-22" class="pilcrow">¶</a></p>
-<p id="section-2-23">Holder key: A client-controlled signing key bound to an artifact by a holder-bound profile.<a href="#section-2-23" class="pilcrow">¶</a></p>
-<p id="section-2-24">Presentation: The act of attaching a unique-human artifact to an HTTP request.<a href="#section-2-24" class="pilcrow">¶</a></p>
-<p id="section-2-25">Holder-bound presentation: A presentation in which the client proves possession of a holder key by attaching an HTTP Message Signature over selected HTTP message components.<a href="#section-2-25" class="pilcrow">¶</a></p>
-<p id="section-2-26">Verifier: The origin-side component that parses and validates a human-continuity presentation and emits verifier output to origin policy.<a href="#section-2-26" class="pilcrow">¶</a></p>
-<p id="section-2-27">Verifier output: A structured local result produced by the verifier. <a href="#verifier-behavior" class="auto internal xref">Section 13</a> defines its states and required contents.<a href="#section-2-27" class="pilcrow">¶</a></p>
+<p id="section-2-21">Challenge context: The profile, effective realm, effective attestation audience, purpose, and requested presentation-assurance value, if any, for which a challenge nonce was issued (<a href="#freshness-replay" class="auto internal xref">Section 11.3</a>).<a href="#section-2-21" class="pilcrow">¶</a></p>
+<p id="section-2-22">Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.<a href="#section-2-22" class="pilcrow">¶</a></p>
+<p id="section-2-23">Holder: The party that controls the use of an artifact in presentations. The holder can be the subject, or a client or agent acting for a human.<a href="#section-2-23" class="pilcrow">¶</a></p>
+<p id="section-2-24">Holder key: A client-controlled signing key bound to an artifact by a holder-bound profile.<a href="#section-2-24" class="pilcrow">¶</a></p>
+<p id="section-2-25">Presentation: The act of attaching a unique-human artifact to an HTTP request.<a href="#section-2-25" class="pilcrow">¶</a></p>
+<p id="section-2-26">Holder-bound presentation: A presentation in which the client proves possession of a holder key by attaching an HTTP Message Signature over selected HTTP message components.<a href="#section-2-26" class="pilcrow">¶</a></p>
+<p id="section-2-27">Verifier: The origin-side component that parses and validates a human-continuity presentation and emits verifier output to origin policy.<a href="#section-2-27" class="pilcrow">¶</a></p>
+<p id="section-2-28">Verifier output: A structured local result produced by the verifier. <a href="#verifier-behavior" class="auto internal xref">Section 13</a> defines its states and required contents.<a href="#section-2-28" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="design-goals">
@@ -1802,7 +1803,7 @@ When per-request unlinkability is desired, <code>Human-Continuity</code> is the 
 <p id="section-6.4-22">Clients <span class="bcp14">MUST</span> ignore any challenge whose purpose value is absent or syntactically invalid or that is not authorized by policy metadata (<a href="#metadata-authorization" class="auto internal xref">Section 8.4</a>).<a href="#section-6.4-22" class="pilcrow">¶</a></p>
 <p id="section-6.4-23">Verifiers <span class="bcp14">MUST NOT</span> treat presentations as valid unless the presentation is authorized by policy metadata (<a href="#metadata-authorization" class="auto internal xref">Section 8.4</a>), the purpose value is present and syntactically valid, the purpose value is accepted by origin policy for the request, and the artifact is bound to that purpose according to the selected profile.<a href="#section-6.4-23" class="pilcrow">¶</a></p>
 <p id="section-6.4-24">Examples:<a href="#section-6.4-24" class="pilcrow">¶</a></p>
-<p id="section-6.4-25">The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact values are illustrative placeholders: a real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in <a href="#examples" class="auto internal xref">Section 22</a>.<a href="#section-6.4-25" class="pilcrow">¶</a></p>
+<p id="section-6.4-25">The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and <code>Signature</code> values are illustative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in <a href="#examples" class="auto internal xref">Section 22</a>.<a href="#section-6.4-25" class="pilcrow">¶</a></p>
 <p id="section-6.4-26">Example 1: default policy selector with origin-scoped policy<a href="#section-6.4-26" class="pilcrow">¶</a></p>
 <p id="section-6.4-27">For a GET request to:<a href="#section-6.4-27" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-28">
@@ -1813,6 +1814,8 @@ https://service.example/accounts/free-tier
 <p id="section-6.4-29">HTTP field in the response:<a href="#section-6.4-29" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-30">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="site_rate_limit"; \
   challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
@@ -1884,6 +1887,8 @@ https://api.example.com/graphql
 <p id="section-6.4-47">HTTP field in the response:<a href="#section-6.4-47" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-48">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="promo:summer-sale"; \
   challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -1936,13 +1941,14 @@ subject-present
 <p id="section-6.4-54">Continuity scope:<a href="#section-6.4-54" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-55">
 <pre>
-(https://realm.example, https://api.example.com, \
-  promo:summer-sale)
+(https://realm.example, https://api.example.com, promo:summer-sale)
 </pre><a href="#section-6.4-55" class="pilcrow">¶</a>
 </div>
 <p id="section-6.4-56">When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:<a href="#section-6.4-56" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-6.4-57">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 POST /graphql HTTP/1.1
 Host: api.example.com
 Content-Type: application/json
@@ -1988,6 +1994,8 @@ Signature: hu=:bidcWjspV0fNiGmSb4/Gz1YNNOovQ6x1vykhJqOlMOGEpMw89IZz\
 <p id="section-7.1-5">Example:<a href="#section-7.1-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.1-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:MB0QuNph5ynfuWXZOJTIzTUIHQ9+puFvDSseCAUBY0s=:
@@ -2017,6 +2025,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-7.2-12">Example:<a href="#section-7.2-12" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.2-13">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -2043,6 +2053,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-7.3-8">Example:<a href="#section-7.3-8" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-7.3-9">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"
@@ -2187,7 +2199,7 @@ https://example.com/.well-known/human-continuity
 <p id="section-8.5-2">Fetched policy metadata is authoritative only as a policy statement by the origin that serves it.<a href="#section-8.5-2" class="pilcrow">¶</a></p>
 <p id="section-8.5-3">Configured metadata is a policy metadata or realm metadata document provisioned through a trusted out-of-band mechanism instead of being fetched. It is authoritative only to the extent of the mechanism that provisioned it and is otherwise processed using the same rules as the corresponding fetched document. A configured policy metadata document's origin member <span class="bcp14">MUST</span> exactly match the canonical HTTPS origin for which it was provisioned. A configured realm metadata document's realm member <span class="bcp14">MUST</span> exactly match the realm for which it was provisioned.<a href="#section-8.5-3" class="pilcrow">¶</a></p>
 <p id="section-8.5-4">A client <span class="bcp14">MUST NOT</span> use policy metadata unless it was obtained over HTTPS from the origin-level metadata location for the request's canonical HTTPS origin, or it is valid configured policy metadata for that canonical HTTPS origin. In both cases, the policy metadata document's origin member <span class="bcp14">MUST</span> exactly match that canonical HTTPS origin.<a href="#section-8.5-4" class="pilcrow">¶</a></p>
-<p id="section-8.5-5">A fetched document <span class="bcp14">MUST NOT</span> be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>. Core metadata fetches <span class="bcp14">MUST NOT</span> follow cross-origin redirects, which do not establish policy absence (<a href="#policy-selection" class="auto internal xref">Section 6.2</a>).<a href="#section-8.5-5" class="pilcrow">¶</a></p>
+<p id="section-8.5-5">A fetched document <span class="bcp14">MUST NOT</span> be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>. Policy metadata fetches and realm metadata fetches using this document's well-known mechanism <span class="bcp14">MUST NOT</span> follow cross-origin redirects.<a href="#section-8.5-5" class="pilcrow">¶</a></p>
 <p id="section-8.5-6">Realm origins and other URLs obtained from fetched metadata are untrusted. Unless trusted local configuration authorizes the exact private destination, a client or verifier fetching such a URL <span class="bcp14">MUST</span> reject any IP literal or resolved address that is loopback, link-local, private-use, multicast, unspecified, or otherwise not globally routable; fetched metadata cannot grant this exception. That client or verifier <span class="bcp14">MUST</span> validate every connection target, including redirects, connect only to the validated address, and send no automatically attached cookies, Authorization credentials, or human-continuity fields.<a href="#section-8.5-6" class="pilcrow">¶</a></p>
 <p id="section-8.5-7">HTTPS protects the fetch. Beyond that, this specification does not authenticate the origin's policy choices or protect against compromised origin infrastructure.<a href="#section-8.5-7" class="pilcrow">¶</a></p>
 <p id="section-8.5-8">A policy metadata or realm metadata document <span class="bcp14">MAY</span> contain members not defined by this document. A client or verifier <span class="bcp14">MUST</span> ignore an unrecognized member of the document, of a policy definition, or of a purpose entry. Profile entries in both documents are the profile-scoped extension point: a profile <span class="bcp14">MAY</span> define additional members in its profile entry. Such members are owned by that profile, are interpreted only when that profile is selected, and <span class="bcp14">MUST NOT</span> redefine or override members defined by this document. A client or verifier <span class="bcp14">MUST</span> ignore any such member it does not understand or that belongs to a profile it does not implement.<a href="#section-8.5-8" class="pilcrow">¶</a></p>
@@ -2521,7 +2533,7 @@ https://realm.example/.well-known/human-continuity-realm
 <a href="#section-11.3.4" class="section-number selfRef">11.3.4. </a><a href="#name-security-boundary" class="section-name selfRef">Security Boundary</a>
           </h4>
 <p id="section-11.3.4-1">Challenge binding establishes freshness at challenge granularity; replay keys prevent repeated acceptance; per-human policy operates separately on <code>continuity_handle</code>. Holder-bound presentations sign the components required by <a href="#message-signature-requirements" class="auto internal xref">Section 11.2</a>. This specification defines no equivalent request binding for bearer presentations.<a href="#section-11.3.4-1" class="pilcrow">¶</a></p>
-<p id="section-11.3.4-2">A validated challenge proves only that the profile used the verifier nonce. If presentation-assurance is requested, the profile <span class="bcp14">MUST</span> bind its evidence to the profile, effective realm, effective attestation audience, purpose, and nonce. Without that parameter, this document requests no additional presentation assurance.<a href="#section-11.3.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.3.4-2">A validated challenge proves only that the profile used the verifier nonce. Evidence for any requested or asserted presentation-assurance value <span class="bcp14">MUST</span> be bound to the profile, effective realm, effective attestation audience, purpose, and challenge nonce. If the challenge omits presentation-assurance, this document requests no additional presentation assurance.<a href="#section-11.3.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2708,6 +2720,8 @@ Access-Control-Expose-Headers: Human-Continuity-Challenge
 <p id="section-15-4">CORS preflight responses need to allow the actual request's method and fields:<a href="#section-15-4" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-15-5">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Access-Control-Allow-Methods: GET, POST
 Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
   Signature, Content-Digest
@@ -2805,7 +2819,7 @@ Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
 <p id="section-20-2">Artifact and signature disclosure: Human-Continuity fields, Signature-Input, Signature, and derived verifier output can be sensitive even when they are not authentication credentials. Ordinary HTTP infrastructure may log, trace, sample, or inspect extension-defined fields by default. Origins <span class="bcp14">SHOULD</span> configure redaction or use profiles whose artifacts and signatures are safe under the expected exposure.<a href="#section-20-2" class="pilcrow">¶</a></p>
 <p id="section-20-3">Holder key compromise: If a holder key and its bound artifact are compromised, an attacker can create holder-bound presentations only while the verifier accepts the artifact's challenge nonce and the artifact remains valid. Profiles <span class="bcp14">SHOULD</span> define holder key rotation and how compromise invalidates keys, artifacts, or outstanding challenges.<a href="#section-20-3" class="pilcrow">¶</a></p>
 <p id="section-20-4">Request binding: Holder signatures cover <code>@method</code>, <code>@target-uri</code>, and Human-Continuity. This specification defines no equivalent binding for bearer presentations.<a href="#section-20-4" class="pilcrow">¶</a></p>
-<p id="section-20-5">Authenticated principals: Neither the challenge context nor mandatory signature coverage includes Authorization, session, or application principal. Whether and how a <code>continuity_handle</code> is associated with a principal is origin policy (<a href="#verifier-behavior" class="auto internal xref">Section 13</a>).<a href="#section-20-5" class="pilcrow">¶</a></p>
+<p id="section-20-5">Authenticated principals: The challenge context and mandatory signature coverage do not bind a presentation to Authorization, a session, or an application principal. Before linking a <code>continuity_handle</code> to a principal, an origin <span class="bcp14">SHOULD</span> either record that principal with the challenge nonce and require the same principal on presentation, or require signature coverage of the request fields used for authentication (<a href="#verifier-behavior" class="auto internal xref">Section 13</a>). Single-use acceptance limits replay but does not provide principal binding (<a href="#freshness-replay" class="auto internal xref">Section 11.3</a>).<a href="#section-20-5" class="pilcrow">¶</a></p>
 <p id="section-20-6">State exhaustion: Required replay and mutable nonce state <span class="bcp14">MUST</span> remain available through its retention deadline. Capacity, partition, or backend failures <span class="bcp14">MUST</span> fail closed as <code>unverifiable</code>. Verifiers <span class="bcp14">SHOULD</span> bound lifetimes, rate-limit issuance and verification, and provision replay storage for their acceptance modes.<a href="#section-20-6" class="pilcrow">¶</a></p>
 <p id="section-20-7">Origin, method, and purpose confusion: Clients <span class="bcp14">MUST</span> verify that challenges and presentations are authorized by policy metadata for the request (<a href="#metadata-authorization" class="auto internal xref">Section 8.4</a>), including any presentation-assurance value. Clients <span class="bcp14">MUST NOT</span> infer cross-origin delegation, realm selection, attestation audience selection, purpose authorization, profile support, or presentation-assurance support from inline fields.<a href="#section-20-7" class="pilcrow">¶</a></p>
 <p id="section-20-8">Policy mapping confusion: The effective policy identifier is derived from the request method, request URI, and policy metadata. Clients and verifiers <span class="bcp14">MUST</span> implement the same matching algorithm. Origins using reverse proxies, request rewriting, routing normalization, or framework-level path normalization <span class="bcp14">MUST</span> ensure that the verifier computes the effective policy identifier from the externally visible request method and URI used by clients.<a href="#section-20-8" class="pilcrow">¶</a></p>
@@ -2813,14 +2827,15 @@ Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
 <p id="section-20-10">Path normalization: Clients and verifiers <span class="bcp14">MUST NOT</span> apply percent-decoding equivalence, dot-segment normalization, path case folding, Unicode normalization, framework route matching, filesystem path normalization, or query string matching when selecting a policy identifier. A request path containing dot-segments <span class="bcp14">MUST NOT</span> match a policy selector or default policy selector under this protocol. Clients and verifiers <span class="bcp14">MUST NOT</span> accept Human-Continuity-Challenge or Human-Continuity for such a request unless a future extension defines safe normalization semantics. Origins using policy_selectors or default_policy_selectors <span class="bcp14">SHOULD</span> reject requests whose externally visible path contains dot-segments.<a href="#section-20-10" class="pilcrow">¶</a></p>
 <p id="section-20-11">Default policy selectors: Default policy selectors are broad policy selectors. Origins <span class="bcp14">SHOULD</span> prefer explicit policy selectors. A default policy selector can cause requests not matched by a policy selector for the request method to authorize purposes or profiles that were intended only for a narrower part of the origin. An origin can exclude a path and method from a broader default policy selector or less-specific subtree pattern by mapping it to a policy whose purposes object is empty; such a policy authorizes nothing and fails closed.<a href="#section-20-11" class="pilcrow">¶</a></p>
 <p id="section-20-12">Because matching is exact, path forms that differ only by a trailing slash, such as <code>"/x"</code> and <code>"/x/"</code>, are distinct paths under <span>[<a href="#RFC3986" class="cite xref">RFC3986</a>]</span> and can select different policy identifiers. Method forms that differ by case are also distinct. A request that has no matching policy selector for its method uses default_policy_selectors, if any, rather than an implicit origin-level fallback. Origins applying request-scoped policy <span class="bcp14">SHOULD</span> cover every protected path in all served forms, by registering each form or by using valid subtree patterns. Origins trying to cover all paths for a method <span class="bcp14">SHOULD</span> use default_policy_selectors for that method, and <span class="bcp14">SHOULD</span> list every method for which that policy is intended.<a href="#section-20-12" class="pilcrow">¶</a></p>
-<p id="section-20-13">Header injection and stripping: Intermediaries or compromised components might add, remove, or modify human-continuity fields. Inline fields do not select the effective policy identifier, effective realm, or effective attestation audience, and they do not broaden authorized purposes, profile choices, or presentation-assurance values authorized by policy metadata. Holder-bound presentations <span class="bcp14">SHOULD</span> cover Human-Continuity in the HTTP Message Signature.<a href="#section-20-13" class="pilcrow">¶</a></p>
+<p id="section-20-13">Header injection and stripping: Intermediaries or compromised components might add, remove, or modify human-continuity fields. Inline fields do not select the effective policy identifier, effective realm, or effective attestation audience, and they do not broaden authorized purposes, profile choices, or presentation-assurance values authorized by policy metadata. Holder-bound presentations cover Human-Continuity in the HTTP Message Signature (<a href="#message-signature-requirements" class="auto internal xref">Section 11.2</a>).<a href="#section-20-13" class="pilcrow">¶</a></p>
 <p id="section-20-14">Signature coverage: HTTP Message Signatures protect only covered components. If a component is not covered, a verifier <span class="bcp14">MUST NOT</span> claim that the presentation is bound to that component.<a href="#section-20-14" class="pilcrow">¶</a></p>
 <p id="section-20-15">Request content: If Content-Digest is present on a holder-bound request, the signature input <span class="bcp14">MUST</span> cover the <code>content-digest</code> component. If request content matters to the attestation decision, the applicable profile <span class="bcp14">SHOULD</span> require Content-Digest coverage.<a href="#section-20-15" class="pilcrow">¶</a></p>
-<p id="section-20-16">Metadata freshness: Stale metadata can cause clients or verifiers to use retired realms, verification material, trust anchors, profiles, or policies. Profiles and origins <span class="bcp14">SHOULD</span> define metadata freshness and refresh behavior. Origins <span class="bcp14">SHOULD</span> send explicit freshness directives, such as Cache-Control with max-age, on policy metadata responses, on the 404 or 410 responses that establish policy absence, and on realm metadata responses. Clients <span class="bcp14">SHOULD NOT</span> apply heuristic caching to these documents; absent explicit freshness directives, a client <span class="bcp14">SHOULD</span> revalidate before relying on them.<a href="#section-20-16" class="pilcrow">¶</a></p>
-<p id="section-20-17">Realm operator trust material compromise and rotation: Compromise of realm operator trust material can allow forged artifacts or false <code>continuity_handle</code> values. This risk applies to every form of verification material and trust anchor a profile uses, including keys, circuits, contracts, ledger state, accumulator roots, and transparency logs. The lifecycle requirements for verification material in <a href="#profile-requirements" class="auto internal xref">Section 10</a>, together with profile-defined revocation or invalidation behavior where applicable, bound the exposure window.<a href="#section-20-17" class="pilcrow">¶</a></p>
-<p id="section-20-18">Browser holder keys: Non-extractable browser key material can reduce key export risk, but it does not prevent use of the key by compromised same-origin script. In browser clients, XSS, malicious dependencies, or other same-origin script compromise can therefore permit unauthorized holder key use even when the private key is not extractable.<a href="#section-20-18" class="pilcrow">¶</a></p>
-<p id="section-20-19">Logging and transcripts: Implementations used by agents, model-facing tools, or developer environments <span class="bcp14">SHOULD</span> attach artifacts in trusted transport code and redact the Human-Continuity, Signature-Input, and Signature fields, verifier outputs containing <code>continuity_handle</code> values, and related holder key material from logs and transcripts by default.<a href="#section-20-19" class="pilcrow">¶</a></p>
-<p id="section-20-20">Header size denial of service: Very large artifacts can consume parser memory or trigger header processing failures. Origins <span class="bcp14">SHOULD</span> enforce size limits before expensive verification.<a href="#section-20-20" class="pilcrow">¶</a></p>
+<p id="section-20-16">Metadata fetching: Realm origins and other URLs obtained from fetched metadata are untrusted and are subject to the destination-validation and credential-handling requirements in <a href="#metadata-precedence" class="auto internal xref">Section 8.5</a>.<a href="#section-20-16" class="pilcrow">¶</a></p>
+<p id="section-20-17">Metadata freshness: Stale metadata can cause clients or verifiers to use retired realms, verification material, trust anchors, profiles, or policies. Profiles and origins <span class="bcp14">SHOULD</span> define metadata freshness and refresh behavior. Origins <span class="bcp14">SHOULD</span> send explicit freshness directives, such as Cache-Control with max-age, on policy metadata responses, on the 404 or 410 responses that establish policy absence, and on realm metadata responses. Clients <span class="bcp14">SHOULD NOT</span> apply heuristic caching to these documents; absent explicit freshness directives, a client <span class="bcp14">SHOULD</span> revalidate before relying on them.<a href="#section-20-17" class="pilcrow">¶</a></p>
+<p id="section-20-18">Realm operator trust material compromise and rotation: Compromise of realm operator trust material can allow forged artifacts or false <code>continuity_handle</code> values. This risk applies to every form of verification material and trust anchor a profile uses, including keys, circuits, contracts, ledger state, accumulator roots, and transparency logs. The lifecycle requirements for verification material in <a href="#profile-requirements" class="auto internal xref">Section 10</a>, together with profile-defined revocation or invalidation behavior where applicable, bound the exposure window.<a href="#section-20-18" class="pilcrow">¶</a></p>
+<p id="section-20-19">Browser holder keys: Non-extractable browser key material can reduce key export risk, but it does not prevent use of the key by compromised same-origin script. In browser clients, XSS, malicious dependencies, or other same-origin script compromise can therefore permit unauthorized holder key use even when the private key is not extractable.<a href="#section-20-19" class="pilcrow">¶</a></p>
+<p id="section-20-20">Logging and transcripts: Implementations used by agents, model-facing tools, or developer environments <span class="bcp14">SHOULD</span> attach artifacts in trusted transport code and redact the Human-Continuity, Signature-Input, and Signature fields, verifier outputs containing <code>continuity_handle</code> values, and related holder key material from logs and transcripts by default.<a href="#section-20-20" class="pilcrow">¶</a></p>
+<p id="section-20-21">Header size denial of service: Very large artifacts can consume parser memory or trigger header processing failures. Origins <span class="bcp14">SHOULD</span> enforce size limits before expensive verification.<a href="#section-20-21" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
@@ -2978,6 +2993,8 @@ https://service.example/api/quota
 <p id="section-22.1-3">The origin challenges on the response to the first request:<a href="#section-22.1-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.1-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -2989,6 +3006,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-22.1-5">The client retries with a presentation bound to the challenge nonce:<a href="#section-22.1-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.1-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 GET /api/quota HTTP/1.1
 Host: service.example
 Human-Continuity: "com.example.unique-human.v1"; \
@@ -3043,6 +3062,8 @@ https://service.example/accounts/free-tier
 <p id="section-22.2-3">The origin can return:<a href="#section-22.2-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.2-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -3055,6 +3076,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="section-22.2-5">The origin sends this challenge before creating the account, allocating the free tier, or applying any other signup effect. The client then checks policy metadata before treating the purpose, profile, and presentation-assurance value as authorized. With the Policy Metadata example below, POST /accounts/free-tier selects the signup policy, which authorizes the challenge. The client can then repeat the not-yet-applied signup operation with a holder-bound presentation:<a href="#section-22.2-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="section-22.2-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 POST /accounts/free-tier HTTP/1.1
 Host: service.example
 Authorization: Bearer account-native-token
@@ -3083,7 +3106,7 @@ Signature: hu=:DohOIdStKJj731Yk4BdjDWOxctbp7v00WLXYWrIc8Ryi/WsDT+7Ri\
 <a href="#section-22.3" class="section-number selfRef">22.3. </a><a href="#name-policy-metadata-2" class="section-name selfRef">Policy Metadata</a>
         </h3>
 <div class="breakable lang-json sourcecode" id="section-22.3-1">
-<pre>&lt;CODE BEGINS&gt;
+<pre>
 {
   "origin": "https://service.example",
   "default_policy_selectors": {
@@ -3136,8 +3159,7 @@ Signature: hu=:DohOIdStKJj731Yk4BdjDWOxctbp7v00WLXYWrIc8Ryi/WsDT+7Ri\
     }
   }
 }
-
-&lt;CODE ENDS&gt;</pre><a href="#section-22.3-1" class="pilcrow">¶</a>
+</pre><a href="#section-22.3-1" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -3408,6 +3430,8 @@ human_agent_delegations (
 <p id="appendix-A-3">Example challenge:<a href="#appendix-A-3" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="appendix-A-4">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
@@ -3417,6 +3441,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 <p id="appendix-A-5">Example presentation:<a href="#appendix-A-5" class="pilcrow">¶</a></p>
 <div class="lang-http-message sourcecode" id="appendix-A-6">
 <pre>
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"; \
