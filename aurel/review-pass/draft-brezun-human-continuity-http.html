@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Brezun</td>
-<td class="center">Expires 6 February 2027</td>
+<td class="center">Expires 7 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-brezun-human-continuity-http-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-05" class="published">5 August 2026</time>
+<time datetime="2026-08-06" class="published">6 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-06">6 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-07">7 February 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1528,13 +1528,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-2-18">Policy identifier: An origin-local token that names a policy definition in policy metadata. A policy identifier is selected for a request path and method.<a href="#section-2-18" class="pilcrow">¶</a></p>
 <p id="section-2-19">Policy selector: A policy metadata mapping that maps request path patterns for one HTTP method to policy identifiers.<a href="#section-2-19" class="pilcrow">¶</a></p>
 <p id="section-2-20">Challenge nonce: A verifier-generated value carried in the challenge parameter of Human-Continuity-Challenge (<a href="#common-field-parameters" class="auto internal xref">Section 7.4</a>) and bound by the selected profile according to <a href="#freshness-replay" class="auto internal xref">Section 11.3</a>. A challenge nonce is distinct from the <code>nonce</code> signature parameter defined by <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>.<a href="#section-2-20" class="pilcrow">¶</a></p>
-<p id="section-2-21">Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.<a href="#section-2-21" class="pilcrow">¶</a></p>
-<p id="section-2-22">Holder: The party that controls the use of an artifact in presentations. The holder can be the subject, or a client or agent acting for a human.<a href="#section-2-22" class="pilcrow">¶</a></p>
-<p id="section-2-23">Holder key: A client-controlled signing key bound to an artifact by a holder-bound profile.<a href="#section-2-23" class="pilcrow">¶</a></p>
-<p id="section-2-24">Presentation: The act of attaching a unique-human artifact to an HTTP request.<a href="#section-2-24" class="pilcrow">¶</a></p>
-<p id="section-2-25">Holder-bound presentation: A presentation in which the client proves possession of a holder key by attaching an HTTP Message Signature over selected HTTP message components.<a href="#section-2-25" class="pilcrow">¶</a></p>
-<p id="section-2-26">Verifier: The origin-side component that parses and validates a human-continuity presentation and emits verifier output to origin policy.<a href="#section-2-26" class="pilcrow">¶</a></p>
-<p id="section-2-27">Verifier output: A structured local result produced by the verifier. <a href="#verifier-behavior" class="auto internal xref">Section 13</a> defines its states and required contents.<a href="#section-2-27" class="pilcrow">¶</a></p>
+<p id="section-2-21">Challenge context: The profile, effective realm, effective attestation audience, purpose, and requested presentation-assurance value, if any, for which a challenge nonce was issued (<a href="#freshness-replay" class="auto internal xref">Section 11.3</a>).<a href="#section-2-21" class="pilcrow">¶</a></p>
+<p id="section-2-22">Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.<a href="#section-2-22" class="pilcrow">¶</a></p>
+<p id="section-2-23">Holder: The party that controls the use of an artifact in presentations. The holder can be the subject, or a client or agent acting for a human.<a href="#section-2-23" class="pilcrow">¶</a></p>
+<p id="section-2-24">Holder key: A client-controlled signing key bound to an artifact by a holder-bound profile.<a href="#section-2-24" class="pilcrow">¶</a></p>
+<p id="section-2-25">Presentation: The act of attaching a unique-human artifact to an HTTP request.<a href="#section-2-25" class="pilcrow">¶</a></p>
+<p id="section-2-26">Holder-bound presentation: A presentation in which the client proves possession of a holder key by attaching an HTTP Message Signature over selected HTTP message components.<a href="#section-2-26" class="pilcrow">¶</a></p>
+<p id="section-2-27">Verifier: The origin-side component that parses and validates a human-continuity presentation and emits verifier output to origin policy.<a href="#section-2-27" class="pilcrow">¶</a></p>
+<p id="section-2-28">Verifier output: A structured local result produced by the verifier. <a href="#verifier-behavior" class="auto internal xref">Section 13</a> defines its states and required contents.<a href="#section-2-28" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="design-goals">
@@ -1940,10 +1941,7 @@ subject-present
 <p id="section-6.4-54">Continuity scope:<a href="#section-6.4-54" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-55">
 <pre>
-NOTE: '\' line wrapping per RFC 8792
-
-(https://realm.example, https://api.example.com, \
-  promo:summer-sale)
+(https://realm.example, https://api.example.com, promo:summer-sale)
 </pre><a href="#section-6.4-55" class="pilcrow">¶</a>
 </div>
 <p id="section-6.4-56">When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:<a href="#section-6.4-56" class="pilcrow">¶</a></p>
@@ -2201,7 +2199,7 @@ https://example.com/.well-known/human-continuity
 <p id="section-8.5-2">Fetched policy metadata is authoritative only as a policy statement by the origin that serves it.<a href="#section-8.5-2" class="pilcrow">¶</a></p>
 <p id="section-8.5-3">Configured metadata is a policy metadata or realm metadata document provisioned through a trusted out-of-band mechanism instead of being fetched. It is authoritative only to the extent of the mechanism that provisioned it and is otherwise processed using the same rules as the corresponding fetched document. A configured policy metadata document's origin member <span class="bcp14">MUST</span> exactly match the canonical HTTPS origin for which it was provisioned. A configured realm metadata document's realm member <span class="bcp14">MUST</span> exactly match the realm for which it was provisioned.<a href="#section-8.5-3" class="pilcrow">¶</a></p>
 <p id="section-8.5-4">A client <span class="bcp14">MUST NOT</span> use policy metadata unless it was obtained over HTTPS from the origin-level metadata location for the request's canonical HTTPS origin, or it is valid configured policy metadata for that canonical HTTPS origin. In both cases, the policy metadata document's origin member <span class="bcp14">MUST</span> exactly match that canonical HTTPS origin.<a href="#section-8.5-4" class="pilcrow">¶</a></p>
-<p id="section-8.5-5">A fetched document <span class="bcp14">MUST NOT</span> be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>. Core metadata fetches <span class="bcp14">MUST NOT</span> follow cross-origin redirects, which do not establish policy absence (<a href="#policy-selection" class="auto internal xref">Section 6.2</a>).<a href="#section-8.5-5" class="pilcrow">¶</a></p>
+<p id="section-8.5-5">A fetched document <span class="bcp14">MUST NOT</span> be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>. Policy metadata fetches and realm metadata fetches using this document's well-known mechanism <span class="bcp14">MUST NOT</span> follow cross-origin redirects.<a href="#section-8.5-5" class="pilcrow">¶</a></p>
 <p id="section-8.5-6">Realm origins and other URLs obtained from fetched metadata are untrusted. Unless trusted local configuration authorizes the exact private destination, a client or verifier fetching such a URL <span class="bcp14">MUST</span> reject any IP literal or resolved address that is loopback, link-local, private-use, multicast, unspecified, or otherwise not globally routable; fetched metadata cannot grant this exception. That client or verifier <span class="bcp14">MUST</span> validate every connection target, including redirects, connect only to the validated address, and send no automatically attached cookies, Authorization credentials, or human-continuity fields.<a href="#section-8.5-6" class="pilcrow">¶</a></p>
 <p id="section-8.5-7">HTTPS protects the fetch. Beyond that, this specification does not authenticate the origin's policy choices or protect against compromised origin infrastructure.<a href="#section-8.5-7" class="pilcrow">¶</a></p>
 <p id="section-8.5-8">A policy metadata or realm metadata document <span class="bcp14">MAY</span> contain members not defined by this document. A client or verifier <span class="bcp14">MUST</span> ignore an unrecognized member of the document, of a policy definition, or of a purpose entry. Profile entries in both documents are the profile-scoped extension point: a profile <span class="bcp14">MAY</span> define additional members in its profile entry. Such members are owned by that profile, are interpreted only when that profile is selected, and <span class="bcp14">MUST NOT</span> redefine or override members defined by this document. A client or verifier <span class="bcp14">MUST</span> ignore any such member it does not understand or that belongs to a profile it does not implement.<a href="#section-8.5-8" class="pilcrow">¶</a></p>

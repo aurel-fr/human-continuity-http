@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                           5 August 2026
-Expires: 6 February 2027
+Intended status: Standards Track                           6 August 2026
+Expires: 7 February 2027
 
 
                        Human Continuity for HTTP
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 February 2027.
+   This Internet-Draft will expire on 7 February 2027.
 
 Copyright Notice
 
@@ -509,6 +509,10 @@ Table of Contents
    parameter of Human-Continuity-Challenge (Section 7.4) and bound by
    the selected profile according to Section 11.3.  A challenge nonce is
    distinct from the nonce signature parameter defined by [RFC9421].
+
+   Challenge context: The profile, effective realm, effective
+   attestation audience, purpose, and requested presentation-assurance
+   value, if any, for which a challenge nonce was issued (Section 11.3).
 
    Subject: The verified human that an artifact attests as unique; the
    human claimed to be a unique human.
@@ -1117,10 +1121,7 @@ Table of Contents
 
    Continuity scope:
 
-   NOTE: '\' line wrapping per RFC 8792
-
-   (https://realm.example, https://api.example.com, \
-     promo:summer-sale)
+   (https://realm.example, https://api.example.com, promo:summer-sale)
 
    When the client retries an operation-specific request with content,
    it includes request content coverage in the HTTP Message Signature:
@@ -1701,8 +1702,9 @@ Table of Contents
    A fetched document MUST NOT be used as policy metadata or realm
    metadata unless the response of the fetch has status code 200 and the
    media type required for that document, matching metadata retrieval in
-   [RFC9728].  Core metadata fetches MUST NOT follow cross-origin
-   redirects, which do not establish policy absence (Section 6.2).
+   [RFC9728].  Policy metadata fetches and realm metadata fetches using
+   this document's well-known mechanism MUST NOT follow cross-origin
+   redirects.
 
    Realm origins and other URLs obtained from fetched metadata are
    untrusted.  Unless trusted local configuration authorizes the exact
