@@ -207,6 +207,8 @@ Policy selector: A policy metadata mapping that maps request path patterns for o
 
 Challenge nonce: A verifier-generated value carried in the challenge parameter of Human-Continuity-Challenge ({{common-field-parameters}}) and bound by the selected profile according to {{freshness-replay}}. A challenge nonce is distinct from the `nonce` signature parameter defined by {{RFC9421}}.
 
+Challenge context: The profile, effective realm, effective attestation audience, purpose, and requested presentation-assurance value, if any, for which a challenge nonce was issued ({{freshness-replay}}).
+
 Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.
 
 Holder: The party that controls the use of an artifact in presentations. The holder can be the subject, or a client or agent acting for a human.
@@ -598,10 +600,7 @@ subject-present
 Continuity scope:
 
 ~~~ text
-NOTE: '\' line wrapping per RFC 8792
-
-(https://realm.example, https://api.example.com, \
-  promo:summer-sale)
+(https://realm.example, https://api.example.com, promo:summer-sale)
 ~~~
 
 When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:
@@ -885,7 +884,7 @@ Configured metadata is a policy metadata or realm metadata document provisioned 
 
 A client MUST NOT use policy metadata unless it was obtained over HTTPS from the origin-level metadata location for the request's canonical HTTPS origin, or it is valid configured policy metadata for that canonical HTTPS origin. In both cases, the policy metadata document's origin member MUST exactly match that canonical HTTPS origin.
 
-A fetched document MUST NOT be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in {{RFC9728}}. Core metadata fetches MUST NOT follow cross-origin redirects, which do not establish policy absence ({{policy-selection}}).
+A fetched document MUST NOT be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in {{RFC9728}}. Policy metadata fetches and realm metadata fetches using this document's well-known mechanism MUST NOT follow cross-origin redirects.
 
 Realm origins and other URLs obtained from fetched metadata are untrusted. Unless trusted local configuration authorizes the exact private destination, a client or verifier fetching such a URL MUST reject any IP literal or resolved address that is loopback, link-local, private-use, multicast, unspecified, or otherwise not globally routable; fetched metadata cannot grant this exception. That client or verifier MUST validate every connection target, including redirects, connect only to the validated address, and send no automatically attached cookies, Authorization credentials, or human-continuity fields.
 

@@ -29,9 +29,10 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parent.parent
 JSON_BLOCK = re.compile(r"~~~ json\r?\n(.*?)\r?\n~~~", re.DOTALL)
 
-# Classification uses all required top-level keys as a structural signature. A
-# score, ensures that omitting or misspelling a required member still routes the document to the schema that reports the
-# error. Verifier output is checked first because it intentionally shares
+# Classification scores each document by overlap with each schema's required
+# top-level keys. This ensures that omitting or misspelling a required member
+# still routes the document to the schema that reports the error. Verifier
+# output is checked first because it intentionally shares
 # "realm" with realm metadata. Other non-metadata signatures are checked only
 # when no metadata signature matches, so extension members cannot hide metadata.
 SCHEMAS = (

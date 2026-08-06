@@ -15,6 +15,8 @@ jobs:
   build:
     name: "Publish New Draft Version"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: "Checkout"
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -25,7 +27,7 @@ jobs:
 
       # See https://github.com/actions/checkout/issues/290
       - name: "Get Tag Annotations"
-        run: git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+        run: git fetch -f origin "$GITHUB_REF:$GITHUB_REF"
 
       - name: "Setup"
         id: setup
