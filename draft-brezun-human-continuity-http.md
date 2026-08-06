@@ -17,6 +17,8 @@ keyword:
   - http message signatures
 
 venue:
+  group: HTTP
+  type: Working Group
   github: aurel-fr/human-continuity-http
   latest: https://aurel-fr.github.io/human-continuity-http/draft-brezun-human-continuity-http.html
   mail: ietf-http-wg@w3.org
@@ -204,6 +206,8 @@ Policy identifier: An origin-local token that names a policy definition in polic
 Policy selector: A policy metadata mapping that maps request path patterns for one HTTP method to policy identifiers.
 
 Challenge nonce: A verifier-generated value carried in the challenge parameter of Human-Continuity-Challenge ({{common-field-parameters}}) and bound by the selected profile according to {{freshness-replay}}. A challenge nonce is distinct from the `nonce` signature parameter defined by {{RFC9421}}.
+
+Challenge context: The profile, effective realm, effective attestation audience, purpose, and requested presentation-assurance value, if any, for which a challenge nonce was issued ({{freshness-replay}}).
 
 Subject: The verified human that an artifact attests as unique; the human claimed to be a unique human.
 
@@ -453,7 +457,7 @@ Verifiers MUST NOT treat presentations as valid unless the presentation is autho
 
 Examples:
 
-The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact values are illustrative placeholders: a real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
+The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and `Signature` values are illustative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
 
 Example 1: default policy selector with origin-scoped policy
 
@@ -466,6 +470,8 @@ https://service.example/accounts/free-tier
 HTTP field in the response:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="site_rate_limit"; \
   challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
@@ -539,6 +545,8 @@ https://api.example.com/graphql
 HTTP field in the response:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="promo:summer-sale"; \
   challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
@@ -592,13 +600,14 @@ subject-present
 Continuity scope:
 
 ~~~ text
-(https://realm.example, https://api.example.com, \
-  promo:summer-sale)
+(https://realm.example, https://api.example.com, promo:summer-sale)
 ~~~
 
 When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 POST /graphql HTTP/1.1
 Host: api.example.com
 Content-Type: application/json
@@ -638,6 +647,8 @@ Each Human-Continuity-Challenge list member value and the Human-Continuity item 
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:MB0QuNph5ynfuWXZOJTIzTUIHQ9+puFvDSseCAUBY0s=:
@@ -676,6 +687,8 @@ A Human-Continuity-Challenge list member MUST include the challenge parameter. A
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -704,6 +717,8 @@ A verifier MUST parse the Human-Continuity field value as a Structured Field Ite
 Example:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"
@@ -869,7 +884,7 @@ Configured metadata is a policy metadata or realm metadata document provisioned 
 
 A client MUST NOT use policy metadata unless it was obtained over HTTPS from the origin-level metadata location for the request's canonical HTTPS origin, or it is valid configured policy metadata for that canonical HTTPS origin. In both cases, the policy metadata document's origin member MUST exactly match that canonical HTTPS origin.
 
-A fetched document MUST NOT be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in {{RFC9728}}. Core metadata fetches MUST NOT follow cross-origin redirects, which do not establish policy absence ({{policy-selection}}).
+A fetched document MUST NOT be used as policy metadata or realm metadata unless the response of the fetch has status code 200 and the media type required for that document, matching metadata retrieval in {{RFC9728}}. Policy metadata fetches and realm metadata fetches using this document's well-known mechanism MUST NOT follow cross-origin redirects.
 
 Realm origins and other URLs obtained from fetched metadata are untrusted. Unless trusted local configuration authorizes the exact private destination, a client or verifier fetching such a URL MUST reject any IP literal or resolved address that is loopback, link-local, private-use, multicast, unspecified, or otherwise not globally routable; fetched metadata cannot grant this exception. That client or verifier MUST validate every connection target, including redirects, connect only to the validated address, and send no automatically attached cookies, Authorization credentials, or human-continuity fields.
 
@@ -1167,7 +1182,7 @@ Replay state, and any nonce state or key material it depends on, MUST remain ava
 
 Challenge binding establishes freshness at challenge granularity; replay keys prevent repeated acceptance; per-human policy operates separately on `continuity_handle`. Holder-bound presentations sign the components required by {{message-signature-requirements}}. This specification defines no equivalent request binding for bearer presentations.
 
-A validated challenge proves only that the profile used the verifier nonce. If presentation-assurance is requested, the profile MUST bind its evidence to the profile, effective realm, effective attestation audience, purpose, and nonce. Without that parameter, this document requests no additional presentation assurance.
+A validated challenge proves only that the profile used the verifier nonce. Evidence for any requested or asserted presentation-assurance value MUST be bound to the profile, effective realm, effective attestation audience, purpose, and challenge nonce. If the challenge omits presentation-assurance, this document requests no additional presentation assurance.
 
 ## Request Content Binding
 
@@ -1327,6 +1342,8 @@ Access-Control-Expose-Headers: Human-Continuity-Challenge
 CORS preflight responses need to allow the actual request's method and fields:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Access-Control-Allow-Methods: GET, POST
 Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
   Signature, Content-Digest
@@ -1432,7 +1449,7 @@ Holder key compromise: If a holder key and its bound artifact are compromised, a
 
 Request binding: Holder signatures cover `@method`, `@target-uri`, and Human-Continuity. This specification defines no equivalent binding for bearer presentations.
 
-Authenticated principals: Neither the challenge context nor mandatory signature coverage includes Authorization, session, or application principal. Whether and how a `continuity_handle` is associated with a principal is origin policy ({{verifier-behavior}}).
+Authenticated principals: The challenge context and mandatory signature coverage do not bind a presentation to Authorization, a session, or an application principal. Before linking a `continuity_handle` to a principal, an origin SHOULD either record that principal with the challenge nonce and require the same principal on presentation, or require signature coverage of the request fields used for authentication ({{verifier-behavior}}). Single-use acceptance limits replay but does not provide principal binding ({{freshness-replay}}).
 
 State exhaustion: Required replay and mutable nonce state MUST remain available through its retention deadline. Capacity, partition, or backend failures MUST fail closed as `unverifiable`. Verifiers SHOULD bound lifetimes, rate-limit issuance and verification, and provision replay storage for their acceptance modes.
 
@@ -1448,11 +1465,13 @@ Default policy selectors: Default policy selectors are broad policy selectors. O
 
 Because matching is exact, path forms that differ only by a trailing slash, such as `"/x"` and `"/x/"`, are distinct paths under {{RFC3986}} and can select different policy identifiers. Method forms that differ by case are also distinct. A request that has no matching policy selector for its method uses default_policy_selectors, if any, rather than an implicit origin-level fallback. Origins applying request-scoped policy SHOULD cover every protected path in all served forms, by registering each form or by using valid subtree patterns. Origins trying to cover all paths for a method SHOULD use default_policy_selectors for that method, and SHOULD list every method for which that policy is intended.
 
-Header injection and stripping: Intermediaries or compromised components might add, remove, or modify human-continuity fields. Inline fields do not select the effective policy identifier, effective realm, or effective attestation audience, and they do not broaden authorized purposes, profile choices, or presentation-assurance values authorized by policy metadata. Holder-bound presentations SHOULD cover Human-Continuity in the HTTP Message Signature.
+Header injection and stripping: Intermediaries or compromised components might add, remove, or modify human-continuity fields. Inline fields do not select the effective policy identifier, effective realm, or effective attestation audience, and they do not broaden authorized purposes, profile choices, or presentation-assurance values authorized by policy metadata. Holder-bound presentations cover Human-Continuity in the HTTP Message Signature ({{message-signature-requirements}}).
 
 Signature coverage: HTTP Message Signatures protect only covered components. If a component is not covered, a verifier MUST NOT claim that the presentation is bound to that component.
 
 Request content: If Content-Digest is present on a holder-bound request, the signature input MUST cover the `content-digest` component. If request content matters to the attestation decision, the applicable profile SHOULD require Content-Digest coverage.
+
+Metadata fetching: Realm origins and other URLs obtained from fetched metadata are untrusted and are subject to the destination-validation and credential-handling requirements in {{metadata-precedence}}.
 
 Metadata freshness: Stale metadata can cause clients or verifiers to use retired realms, verification material, trust anchors, profiles, or policies. Profiles and origins SHOULD define metadata freshness and refresh behavior. Origins SHOULD send explicit freshness directives, such as Cache-Control with max-age, on policy metadata responses, on the 404 or 410 responses that establish policy absence, and on realm metadata responses. Clients SHOULD NOT apply heuristic caching to these documents; absent explicit freshness directives, a client SHOULD revalidate before relying on them.
 
@@ -1526,6 +1545,8 @@ https://service.example/api/quota
 The origin challenges on the response to the first request:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -1537,6 +1558,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 The client retries with a presentation bound to the challenge nonce:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 GET /api/quota HTTP/1.1
 Host: service.example
 Human-Continuity: "com.example.unique-human.v1"; \
@@ -1587,6 +1610,8 @@ https://service.example/accounts/free-tier
 The origin can return:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 Cache-Control: no-store
@@ -1599,6 +1624,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 The origin sends this challenge before creating the account, allocating the free tier, or applying any other signup effect. The client then checks policy metadata before treating the purpose, profile, and presentation-assurance value as authorized. With the Policy Metadata example below, POST /accounts/free-tier selects the signup policy, which authorizes the challenge. The client can then repeat the not-yet-applied signup operation with a holder-bound presentation:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 POST /accounts/free-tier HTTP/1.1
 Host: service.example
 Authorization: Bearer account-native-token
@@ -1676,7 +1703,6 @@ The challenge above carried a challenge nonce. The challenge nonce evidence requ
   }
 }
 ~~~
-{: sourcecode-markers="true"}
 
 ## Realm Metadata
 
@@ -1770,6 +1796,8 @@ The example profile "com.example.unique-human.v1" is fictional. It defines an op
 Example challenge:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="free_tier_signup"; \
   challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
@@ -1779,6 +1807,8 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 Example presentation:
 
 ~~~ http-message
+NOTE: '\' line wrapping per RFC 8792
+
 Human-Continuity: "com.example.unique-human.v1"; \
   artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
   purpose="free_tier_signup"; \

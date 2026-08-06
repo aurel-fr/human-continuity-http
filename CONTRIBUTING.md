@@ -19,8 +19,8 @@ subject to a Simplified BSD License) in Contributions.
 ## How to Contribute
 
 Contributions can be made by creating pull requests, opening an issue, or
-posting to the working group mailing list. See above for the email address
-and a note about policy.
+posting to the [HTTP Working Group mailing list](mailto:ietf-http-wg@w3.org)
+([archive](https://lists.w3.org/Archives/Public/ietf-http-wg/)).
 
 Here are two ways to create a pull request ("PR"):
 
