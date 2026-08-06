@@ -457,7 +457,7 @@ Verifiers MUST NOT treat presentations as valid unless the presentation is autho
 
 Examples:
 
-The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and `Signature` values are illustative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
+The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and `Signature` values are illustrative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
 
 Example 1: default policy selector with origin-scoped policy
 
