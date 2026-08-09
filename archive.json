@@ -1,17 +1,12 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-06T02:22:27.270913+00:00",
+  "timestamp": "2026-08-09T01:27:19.059859+00:00",
   "repo": "aurel-fr/human-continuity-http",
   "labels": [
     {
       "name": "bug",
       "description": "Something isn't working",
       "color": "d73a4a"
-    },
-    {
-      "name": "documentation",
-      "description": "Improvements or additions to documentation",
-      "color": "0075ca"
     },
     {
       "name": "duplicate",
@@ -47,9 +42,160 @@
       "name": "wontfix",
       "description": "This will not be worked on",
       "color": "ffffff"
+    },
+    {
+      "name": "security",
+      "description": "",
+      "color": "e20356"
+    },
+    {
+      "name": "normative-gap",
+      "description": "",
+      "color": "53b875"
+    },
+    {
+      "name": "privacy",
+      "description": "",
+      "color": "454147"
+    },
+    {
+      "name": "process",
+      "description": "",
+      "color": "947172"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOTuLynM8AAAABLzJ7cA",
+      "title": "Same-tag signature injection can force rejection",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/3",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "security",
+        "normative-gap"
+      ],
+      "body": "## Location\n\n\u00a711.2, HTTP Message Signature Requirements, line 1143.\n\n## Problem\n\nThe verifier currently rejects any presentation containing more than one signature tagged `human-continuity`.\n\nAn intermediary or other request-mutating party can append a structurally valid same-tag candidate that does not cryptographically verify, causing rejection of the legitimate signature. RFC 9421 explicitly discusses this multiple-signature injection risk in [\u00a77.2.6](https://www.rfc-editor.org/rfc/rfc9421.html#section-7.2.6).\n\n## Required resolution\n\nDefine bounded candidate processing rather than rejecting solely on multiplicity:\n\n  - examine same-tag candidates within documented resource limits;\n  - accept only a candidate that verifies and satisfies the artifact/holder-key binding;\n  - allow non-accepted candidates to contribute no verifier output or signature-derived replay inputs; and\n  - continue recording every otherwise-applicable challenge and profile replay key.\n\nThe candidate bound should align with HTTP header-size limits so it does not create a new trivial rejection threshold.",
+      "createdAt": "2026-08-07T04:14:34Z",
+      "updatedAt": "2026-08-07T04:14:46Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOTuLynM8AAAABLzLPnA",
+      "title": "Define @target-uri context behind reverse proxies",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/4",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "security",
+        "normative-gap"
+      ],
+      "body": "## Location\n\n\u00a76.1, \u00a711.2 line 1133, and \u00a720 line 1458.\n\n## Problem\n\nHolder-bound signatures cover `@target-uri`, but the draft does not fully define how a verifier behind a CDN, gateway, or reverse proxy obtains the client-visible, pre-rewrite URI.\n\nRFC 9421 requires an application or profile to specify this component context, especially when the verifier sees a transformed request.\n\n## Required resolution\n\nRequire deployments to:\n\n  - derive `@target-uri` from the same pre-rewrite context used by the signer;\n  - verify before rewriting, use trusted configuration, or use authenticated intermediary-provided context;\n  - never derive security-relevant URI components from client-controlled forwarding metadata; and\n  - use the same trusted external-origin context for policy selection and attestation audience.\n\nIf the required context is unavailable, validation is `unverifiable`. If the correct context is known and the signature fails, it is `invalid`.",
+      "createdAt": "2026-08-07T04:18:32Z",
+      "updatedAt": "2026-08-07T04:18:38Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOTuLynM8AAAABLzMDQw",
+      "title": "Coexisting Web Bot Auth and Human Continuity signatures do not establish delegation",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/5",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "normative-gap"
+      ],
+      "body": "## Location\n\n\u00a71.1.5 and \u00a722.7.\n\n## Problem\n\n\u00a71.1.5 says Human Continuity links agent requests to the human \u201con whose behalf\u201d the agent acts, but the protocol defines no assertion or verification of that delegation relationship.\n\nCurrent Web Bot Auth explicitly says that multiple signatures do not by themselves express authorization, delegation, or consent: [\u00a74.2.2](https://www.ietf.org/archive/id/draft-meunier-webbotauth-httpsig-protocol-00.html#section-4.2.2).\n\n## Proposed `-01` resolution\n\nKeep delegation semantics outside core:\n\n  - describe Web Bot Auth and Human Continuity as independent signals;\n  - state that their coexistence does not establish delegation, authorization, or consent; and\n  - revise \u00a722.7 to assume that the origin established the agent\u2013human association through a separate authenticated authorization process.",
+      "createdAt": "2026-08-07T04:21:14Z",
+      "updatedAt": "2026-08-07T04:21:23Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOTuLynM8AAAABLzNCWw",
+      "title": "Clarify \u00a722.7 against Web Bot Auth \u201cNo Human Correlation\u201d",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/6",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "privacy"
+      ],
+      "body": "## Location\n\n\u00a71.1.5 and \u00a722.7.\n\n## Problem\n\n\u00a722.7 stores an `agent_key_thumbprint` beside a stable per-human continuity handle. Web Bot Auth says its signing key MUST NOT be tied to a specific human individual: [\u00a76.2](https://www.ietf.org/archive/id/draft-meunier-webbotauth-httpsig-protocol-00.html#section-6.2).\n\nThe example does not say whether `agent_key_thumbprint` is the Web Bot Auth signing key. If it is, the example appears to conflict with that privacy requirement.\n\n## Required decision\n\nEither:\n\n  - state that this is a separate, origin-scoped delegation credential rather than the Web Bot Auth signing key;\n  - rescope or remove the mapping; or\n  - document why the composition is compatible with Web Bot Auth\u2019s privacy requirements.\n\nCross-reference the delegation-semantics issue.",
+      "createdAt": "2026-08-07T04:24:28Z",
+      "updatedAt": "2026-08-07T04:24:36Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOTuLynM8AAAABLzN8pg",
+      "title": "Align venue metadata with DISPATCH routing",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/7",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "process"
+      ],
+      "body": "## Location\n\nFront matter, lines 19\u201325.\n\n## Problem\n\nThe rendered draft currently directs discussion to the HTTP Working Group, while the intended routing and discussion venue is DISPATCH. Venue metadata does not imply WG adoption, but it should direct readers to the correct group and mailing list.\n\n## Proposed fix\n\n  \n```yaml\n  venue:\n    group: DISPATCH\n    type: Working Group\n    mail: dispatch@ietf.org\n    arch: https://mailarchive.ietf.org/arch/browse/dispatch/\n```\n\nKeep the existing github and latest values.",
+      "createdAt": "2026-08-07T04:27:20Z",
+      "updatedAt": "2026-08-07T04:27:26Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOTuLynM8AAAABLzOfvg",
+      "title": "State that continuity is not ongoing consent",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/8",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "security",
+        "privacy"
+      ],
+      "body": "## Location\n\n\u00a77.5 and \u00a713.\n\n## Problem\n\nThe draft says a `continuity_handle` is not an authenticator, but does not separately state that recognizing the same backing human is not evidence of consent or authorization for the current action.\n\n`human-approved` covers the presentation according to profile-defined semantics. It is not automatically authorization of the HTTP request or application operation.\n\n## Proposed text\n\ntbd",
+      "createdAt": "2026-08-07T04:29:15Z",
+      "updatedAt": "2026-08-07T04:29:22Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOTuLynM8AAAABLzQRZw",
+      "title": "Require validation of a covered Content-Digest",
+      "url": "https://github.com/aurel-fr/human-continuity-http/issues/9",
+      "state": "OPEN",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "security",
+        "normative-gap"
+      ],
+      "body": "## Location\n\n\u00a711.2 line 1139, \u00a711.4 lines 1189\u20131195, and \u00a720 line 1472.\n\n## Problem\n\nThe draft repeatedly requires an HTTP Message Signature to cover `content-digest`, but never requires the verifier to validate that field against the received content.\n\nCoverage authenticates the field value; it does not establish that the field describes the received body. RFC 9421 [\u00a77.2.8](https://www.rfc-editor.org/rfc/rfc9421.html#section-7.2.8) identifies this content-substitution risk. RFC 9530 defines validation but permits recipients to ignore digests, so Human Continuity must explicitly require it before claiming content binding.\n\nThe requirement is currently repeated across three sections, creating unnecessary text and opportunities for drift.\n\n## Proposed resolution\n\nMake \u00a711.4 the single normative source:\n\n> If a holder-bound presentation includes a `Content-Digest` field covered by the HTTP Message Signature, the verifier MUST validate the received content against that field in accordance with RFC 9530 before returning `valid`. Validation MUST succeed using at least one digest algorithm acceptable for this use. If no acceptable digest is present or validation fails, the presentation is `invalid`; if validation cannot be completed, it is `unverifiable`.\n\nThen:\n\n  - replace the duplicate requirement in \u00a711.2 with a reference to \u00a711.4;\n  - reduce \u00a720 to a concise security warning and reference to \u00a711.4; and\n  - retain the operation-specific guidance in \u00a711.4.\n\nThis fixes the validation gap while shortening and centralizing the content-binding rules.",
+      "createdAt": "2026-08-07T04:35:12Z",
+      "updatedAt": "2026-08-07T04:35:23Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
