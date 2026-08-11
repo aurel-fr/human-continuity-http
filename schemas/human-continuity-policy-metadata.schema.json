@@ -71,15 +71,15 @@
     },
     "path_pattern": {
       "type": "string",
-      "pattern": "^/(?!$)(?!/)(?!\\*\\*$)(?!\\.well-known/)(?!\\.\\.?(?:/|$))(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)(?:[^*]|/(?!\\*))*?(?:/\\*\\*)?$"
+      "pattern": "^/(?!$)(?!/)(?!\\*\\*$)(?!\\.well-known/)(?!\\.\\.?(?:/|$))(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*//)(?:[^*\\u0000-\\u0020\\u007F]|/(?!\\*))*?(?:/\\*\\*)?$(?![\\s\\S])"
     },
     "method_token": {
       "type": "string",
-      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$(?![\\s\\S])"
     },
     "policy_identifier": {
       "type": "string",
-      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+      "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$(?![\\s\\S])"
     },
     "purpose_entry": {
       "type": "object",
@@ -113,7 +113,7 @@
     "profile_identifier": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+      "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$(?![\\s\\S])"
     },
     "profile_entry": {
       "type": "object",
@@ -124,7 +124,7 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$"
+            "pattern": "^(?!.*[\"\\\\])[\\u0021-\\u007E]+$(?![\\s\\S])"
           },
           "minItems": 1,
           "uniqueItems": true
