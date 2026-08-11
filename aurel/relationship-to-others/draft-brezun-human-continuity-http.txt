@@ -325,8 +325,7 @@ Table of Contents
    unique human, without requiring a global human identifier.
 
    Origins SHOULD NOT request Human-Continuity when an unlinkable
-   authorization, redemption, rate-limit, or credit-spend mechanism is
-   sufficient.
+   authorization, redemption, or credit-spend mechanism is sufficient.
 
    The boundary between this specification and unlinkable mechanisms
    turns on where policy state lives and when policy is applied.
