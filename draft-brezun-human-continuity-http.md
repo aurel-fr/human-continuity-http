@@ -81,7 +81,7 @@ informative:
     date: 2026-06-27
 --- abstract
 
-This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, the same human yields one verifier-local handle across all of their accounts, devices, and agents and cannot present as two, distinguishing the signal from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request.
+This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, valid presentations backed by the same human yield the same verifier-local handle, regardless of account, device, or agent, and cannot yield a second handle for that human. This differs from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request.
 
 The framework is independent of any realm operator, credential technology, proof system, or definition of humanness. Companion profiles define artifact syntax, issuance, verification, challenge binding, replay behavior, holder binding, privacy properties, realm metadata, and verifier output. A conforming profile produces a verifier-local `continuity_handle` scoped to a realm, attestation audience, and purpose. This version defines no initial profile.
 
@@ -145,9 +145,7 @@ Version 0.2.0 of x401 {{X401}} gates a route on a verifier-composed, nonce-beari
 
 ### Relationship to Web Bot Auth
 
-Web Bot Auth {{I-D.meunier-webbotauth-httpsig-protocol}} authenticates the automated agent behind an HTTP request, using an HTTP Message Signature {{RFC9421}} with the `web-bot-auth` tag and signing keys discovered through an HTTP Message Signatures Directory {{I-D.meunier-webbotauth-httpsig-directory}}. The two mechanisms are complementary: Web Bot Auth identifies the agent, and Human Continuity links those requests to the unique human on whose behalf it acts.
-
-The two compose on the same agent request as independent HTTP Message Signatures, each carrying its own `tag`: a `web-bot-auth` signature and a holder-bound `human-continuity` signature can coexist, and a verifier selects the `human-continuity` signature by its tag ({{message-signature-requirements}}, {{Section 7.2.7 of RFC9421}}).
+Web Bot Auth {{I-D.meunier-webbotauth-httpsig-protocol}} authenticates the automated agent behind an HTTP request using an HTTP Message Signature {{RFC9421}} with the `web-bot-auth` tag; its verification-key discovery mechanisms include an HTTP Message Signatures Directory {{I-D.meunier-webbotauth-httpsig-directory}}. A `web-bot-auth` signature and a holder-bound `human-continuity` signature can coexist on one request as independent HTTP Message Signatures, each with its own `tag`; a verifier selects the `human-continuity` signature by its tag ({{message-signature-requirements}}, {{Section 7.2.7 of RFC9421}}).
 
 ## Applicability and Alternatives {#applicability}
 
@@ -159,11 +157,11 @@ The boundary between this specification and unlinkable mechanisms turns on where
 
 `Human-Continuity` instead allows policy to bind at decision time. The verifier can use mutable per-human state keyed by the resulting `continuity_handle` to recognize that a presentation is backed by the same verified unique human as an earlier presentation in the same declared continuity scope. That recognition is needed when a per-human rule may be applied, audited, or revised after artifacts are already in use. An unlinkable mechanism cannot express such a rule because it cannot distinguish repeated use by one human from use by several. Examples include duplicate account prevention, per-human quota grouping across accounts or sessions, Sybil-resistant participation, recovery-sensitive account workflows, grant or trial credit claims that require human continuity, and agent delegation policies that group activity by the backing human. For use cases involving allocation or abuse control, a scoped `continuity_handle` does not eliminate abuse; it changes the attacker's bottleneck from creating accounts to obtaining access to distinct verified humans.
 
-Unlinkable token, credential, and credit systems often require the client to retain token, credential, presentation, balance, refund, or other protocol state. Such systems can be appropriate for short-lived or single-device use cases, such as solving a CAPTCHA and redeeming a small number of tokens. They can be less suitable when the origin requires long-lived continuity, multi-device use, or recovery after loss of client state. Those requirements are a primary motivation for verifier-local human continuity, but they also increase privacy risk and therefore require narrow continuity scopes.
+Unlinkable mechanisms that rely on client-retained tokens, credentials, or balances can suit short-lived or single-device use but be less suitable for long-lived, multi-device, or recoverable continuity. Support for those properties in this framework depends on the selected profile's state, recovery, and device continuity model ({{profile-requirements}}), increases privacy risk, and requires narrow continuity scopes.
 
 A credential presentation alone shows that the subject holds a qualifying credential at presentation time. If that check suffices, a presentation protocol without this document is preferable.
 
-A client-stored linkable value, such as a long-lived cookie or bearer token, can also give a verifier a stable per-client value, but it derives its continuity from the client retaining and replaying one secret. A client can hold several such values to present as several distinct continuities, and losing the value loses the continuity. A `continuity_handle` instead derives from the verification of a unique human under a realm and is computed verifier-locally: within a scope a human has at most one, regardless of how many clients, accounts, or credentials they control, cannot obtain a second, and recovers the same value after loss of client state.
+A client-stored linkable value, such as a long-lived cookie or bearer token, derives its continuity from retaining and replaying one secret. A client can hold several such values to present as distinct continuities, and losing a value loses that continuity. A `continuity_handle` instead derives from verification of a unique human under a realm and is computed verifier-locally. Within a scope, valid presentations backed by the same verified human produce the same handle, regardless of the clients, accounts, or credentials used ({{continuity-handle-requirements}}). After loss of client state, any further valid presentation produces that handle; the selected profile defines whether such a presentation remains possible ({{profile-requirements}}).
 
 # Conventions and Terminology
 
@@ -457,7 +455,7 @@ Verifiers MUST NOT treat presentations as valid unless the presentation is autho
 
 Examples:
 
-The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and `Signature` values are illustrative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
+The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and `Signature` values are illustrative placeholders, and the profile identifier "com.example.unique-human.v1" used throughout names a fictional profile. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in {{examples}}.
 
 Example 1: default policy selector with origin-scoped policy
 
@@ -502,34 +500,15 @@ Relevant policy metadata:
 }
 ~~~
 
-Effective policy identifier:
+Effective values and continuity scope:
 
 ~~~ text
-site
-~~~
-
-Effective realm:
-
-~~~ text
-https://realm.example
-~~~
-
-Effective attestation audience:
-
-~~~ text
-https://service.example
-~~~
-
-Purpose:
-
-~~~ text
-site_rate_limit
-~~~
-
-Continuity scope:
-
-~~~ text
-(https://realm.example, https://service.example, site_rate_limit)
+effective policy identifier:    site
+effective realm:                https://realm.example
+effective attestation audience: https://service.example
+purpose:                        site_rate_limit
+continuity scope:
+  (https://realm.example, https://service.example, site_rate_limit)
 ~~~
 
 No policy selector is found for GET /accounts/free-tier, so the GET default policy selector selects the site policy. The effective attestation audience is the canonical HTTPS origin of the request.
@@ -591,16 +570,12 @@ Relevant policy metadata:
 
 The POST /graphql request selects the GraphQL policy. The concrete purpose "promo:summer-sale" does not equal any purpose listed under the policy, so the "promo:{campaign}" purpose template authorizes it and selects the realm, profile entry, and presentation-assurance value. For the concrete purpose "promo:loyalty", the exactly matching purpose takes precedence even though the purpose template also matches it: its purpose entry applies, including its "human-verified" presentation-assurance value, with no fallback to the purpose template's purpose entry. The concrete purpose, not the purpose template, is part of the continuity scope. A purpose template authorizes concrete purpose values; the concrete purpose itself is always carried in the challenge.
 
-Selected presentation-assurance value:
+Selected presentation-assurance value and continuity scope:
 
 ~~~ text
-subject-present
-~~~
-
-Continuity scope:
-
-~~~ text
-(https://realm.example, https://api.example.com, promo:summer-sale)
+selected presentation-assurance value: subject-present
+continuity scope:
+  (https://realm.example, https://api.example.com, promo:summer-sale)
 ~~~
 
 When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:
@@ -860,7 +835,7 @@ Profile identifiers in policy metadata use the syntax defined in {{profile-ident
 
 Each profile entry has the following members.
 
-presentation_assurances: OPTIONAL non-empty array of unique strings. The presentation-assurance values directly authorized for this profile entry. A directly authorized value can be requested in Human-Continuity-Challenge or asserted in Human-Continuity even when the challenge did not request it. If omitted, policy metadata does not authorize presentation-assurance support for this profile entry.
+presentation_assurances: OPTIONAL array. If present, it MUST consist of one or more unique strings, each satisfying the presentation-assurance value syntax in {{presentation-assurance}}. Each value is directly authorized for this profile entry and can be requested in Human-Continuity-Challenge or asserted in Human-Continuity even if the challenge did not request it. If omitted, policy metadata does not authorize presentation-assurance support for this profile entry.
 
 Profile entries are the profile-scoped extension point ({{metadata-precedence}}).
 
@@ -1083,16 +1058,6 @@ realm_operator_purpose_visibility: Whether the realm operator learns no purpose,
 realm_operator_challenge_visibility: Whether the realm operator learns no challenge nonce, the challenge nonce at issuance, the challenge nonce at redemption, or profile-defined challenge nonce information.
 
 realm_metadata_fetch_visibility: What client information, if any, is revealed while obtaining realm metadata for the profile.
-
-## Example Profile Categories
-
-This section is informative. It gives examples of companion profile categories for early discussion. These examples are illustrative only; a real profile can combine these patterns.
-
-- Unique-human profiles based on accounts or registries. Such a profile would define how a holder proves control of, or membership in, a unique-human account or registry entry. The profile would define how the verifier's origin policy context is mapped to realm, attestation audience, and purpose, how the resulting nullifier or equivalent scope-local value is exposed as `continuity_handle`, and what replay, holder binding, recovery, and privacy properties verifiers can rely on.
-
-- Proof profiles backed by credentials or certificates. Such a profile would define how a holder proves possession of a qualifying credential, certificate, or attestation signed by the realm operator. The profile would define the artifact format, realm operator trust model, verifier algorithm, revocation handling, holder binding, replay behavior, lifecycle behavior, and derivation of a scoped `continuity_handle`.
-
-Other realm operators, credential systems, proof systems, and issuance ceremonies can define profiles without changing the HTTP fields, policy metadata, realm metadata, or core verifier output model defined here.
 
 # Holder-Bound Presentations
 
@@ -1645,7 +1610,7 @@ Signature: hu=:DohOIdStKJj731Yk4BdjDWOxctbp7v00WLXYWrIc8Ryi/WsDT+7Ri\
   TXTU+U6Fa6aOUFYF83ZTHBSMX1N0Q4MCQ==:
 ~~~
 
-The challenge above carried a challenge nonce. The challenge nonce evidence required by {{freshness-replay}} is carried inside the artifact according to the fictional profile; it does not appear as a Signature-Input parameter.
+The challenge above carried a challenge nonce. The challenge nonce evidence required by {{freshness-replay}} is carried inside the artifact according to the example profile; it does not appear as a Signature-Input parameter.
 
 ## Policy Metadata
 
@@ -1765,59 +1730,7 @@ UNIQUE (
 
 `stored_continuity_handle` is policy state, not an authenticator. It can be the raw `continuity_handle` or, preferably for persistent storage, a verifier-local protected derivative. Account access still depends on the origin's native authentication and authorization mechanisms.
 
-## Agent Delegation Binding
-
-For agent delegation, a verifier can use a separate purpose and bind agent keys to the resulting `continuity_handle`:
-
-~~~ text
-purpose = agent_delegation
-~~~
-
-~~~ text
-human_agent_delegations (
-  realm,
-  attestation_audience,
-  purpose,
-  stored_continuity_handle,
-  agent_key_thumbprint,
-  account_id,
-  expires_at
-)
-~~~
-
 --- back
-
-# Illustrative Profile Sketch
-
-This appendix is informative. It is not a complete profile specification and is not sufficient for deployment. It exists only to illustrate how a companion profile would use the HTTP framework.
-
-The example profile "com.example.unique-human.v1" is fictional. It defines an opaque artifact that proves, according to the profile's verification rules, that the subject satisfies the profile's unique-human criteria. The artifact is valid for one attestation audience and one purpose. Verification produces a scope-local `continuity_handle`.
-
-Example challenge:
-
-~~~ http-message
-NOTE: '\' line wrapping per RFC 8792
-
-Human-Continuity-Challenge: "com.example.unique-human.v1"; \
-  purpose="free_tier_signup"; \
-  challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
-  presentation-assurance="subject-present"
-~~~
-
-Example presentation:
-
-~~~ http-message
-NOTE: '\' line wrapping per RFC 8792
-
-Human-Continuity: "com.example.unique-human.v1"; \
-  artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
-  purpose="free_tier_signup"; \
-  presentation-assurance="subject-present"
-~~~
-
-A successful verification produces the verifier output shown in {{verifier-behavior}}, with `state` set to "valid" and a scope-local `continuity_handle` for the selected continuity scope.
-
-A real profile would still need to define artifact syntax, issuance, verification, holder binding, challenge nonce binding, supported presentation-assurance values, replay behavior, revocation, lifecycle events, privacy properties, and `continuity_handle` derivation.
 
 # Open Issues
 
