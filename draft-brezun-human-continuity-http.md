@@ -55,7 +55,6 @@ informative:
   RFC9576:
   RFC9577:
   RFC9728:
-  I-D.ietf-privacypass-arc-crypto:
   I-D.irtf-cfrg-bbs-per-verifier-linkability:
   I-D.meunier-webbotauth-httpsig-directory:
   I-D.meunier-webbotauth-httpsig-protocol:
@@ -121,9 +120,9 @@ This document is therefore a discovery, challenge, and transport substrate, not 
 
 ## Relationship to Existing Work
 
-### Relationship to Privacy Pass, ARC, and ACT
+### Relationship to Privacy Pass and ACT
 
-Privacy Pass {{RFC9576}} provides privacy-preserving token issuance and redemption for cases where the origin should learn an unlinkable fact rather than a stable continuity value. Anonymous Rate-Limited Credentials (ARC) {{I-D.ietf-privacypass-arc-crypto}} similarly support unlinkable rate limiting, and Anonymous Credit Tokens (ACT) {{I-D.schlesinger-cfrg-act}} unlinkable credit issuance and spending. These mechanisms are complementary to this specification: {{applicability}} defines the boundary between them and scoped human continuity.
+Privacy Pass {{RFC9576}} provides privacy-preserving token issuance and redemption for cases where the origin should learn an unlinkable fact rather than a stable continuity value. Anonymous Credit Tokens (ACT) {{I-D.schlesinger-cfrg-act}} support unlinkable credit issuance and spending. These mechanisms are complementary to this specification: {{applicability}} defines the boundary between them and scoped human continuity.
 
 ### Relationship to OAuth Protected Resource Metadata
 
@@ -153,7 +152,7 @@ This specification is intended for origins that require verifier-local human con
 
 Origins SHOULD NOT request `Human-Continuity` when an unlinkable authorization, redemption, rate-limit, or credit-spend mechanism is sufficient.
 
-The boundary between this specification and unlinkable mechanisms turns on where policy state lives and when policy is applied. Unlinkable capability systems fix a spendable allowance at issuance and decide each redemption against the artifact rather than the human. Privacy Pass {{RFC9576}}, the Privacy Pass HTTP authentication scheme {{RFC9577}}, ARC {{I-D.ietf-privacypass-arc-crypto}}, and ACT {{I-D.schlesinger-cfrg-act}} issue tokens, bounded-use credentials, or credits. At redemption time, the verifier asks only whether the bearer presents a still-valid, not-yet-exhausted capability: that the client is authorized to proceed, has satisfied an issuance precondition such as solving a CAPTCHA, holds a spendable token or credit, has not double-spent it, or is within an anonymous rate limit.
+The boundary between this specification and unlinkable mechanisms turns on where policy state lives and when policy is applied. Unlinkable capability systems fix a spendable allowance at issuance and decide each redemption against the artifact rather than the human. Privacy Pass {{RFC9576}}, the Privacy Pass HTTP authentication scheme {{RFC9577}}, and ACT {{I-D.schlesinger-cfrg-act}} issue tokens or credits. At redemption time, the verifier asks only whether the bearer presents a still-valid, not-yet-exhausted capability: that the client is authorized to proceed, has satisfied an issuance precondition such as solving a CAPTCHA, holds a spendable token or credit, or has not double-spent it.
 
 `Human-Continuity` instead allows policy to bind at decision time. The verifier can use mutable per-human state keyed by the resulting `continuity_handle` to recognize that a presentation is backed by the same verified unique human as an earlier presentation in the same declared continuity scope. That recognition is needed when a per-human rule may be applied, audited, or revised after artifacts are already in use. An unlinkable mechanism cannot express such a rule because it cannot distinguish repeated use by one human from use by several. Examples include duplicate account prevention, per-human quota grouping across accounts or sessions, Sybil-resistant participation, recovery-sensitive account workflows, grant or trial credit claims that require human continuity, and agent delegation policies that group activity by the backing human. For use cases involving allocation or abuse control, a scoped `continuity_handle` does not eliminate abuse; it changes the attacker's bottleneck from creating accounts to obtaining access to distinct verified humans.
 
