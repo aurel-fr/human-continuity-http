@@ -17,12 +17,10 @@ issuance time. Every decision-time check reads state attached to the _artifact_ 
 still-valid token, a not-yet-exhausted credential, an unspent credit — never state
 attached to the _human_. Privacy Pass ([RFC 9576](https://www.rfc-editor.org/rfc/rfc9576.html)),
 the Privacy Pass HTTP authentication scheme ([RFC 9577](https://www.rfc-editor.org/rfc/rfc9577.html)),
-ARC ([draft-ietf-privacypass-arc-crypto](https://datatracker.ietf.org/doc/draft-ietf-privacypass-arc-crypto/)),
 and ACT ([draft-schlesinger-cfrg-act](https://datatracker.ietf.org/doc/draft-schlesinger-cfrg-act/))
 are capability systems: a Privacy Pass origin prevents a token with the same nonce from
-being redeemed twice, ACT detects reuse through nullifiers, and ARC checks a
-per-presentation tag for prior use. None of these decisions reach mutable, per-human
-state across an open-ended event history.
+being redeemed twice, and ACT detects reuse through nullifiers. Neither decision reaches
+mutable, per-human state across an open-ended event history.
 
 A **policy-state system** binds policy at decision time. The verifier reads mutable
 per-human state — a per-human row it maintains verifier-locally within a continuity
@@ -59,16 +57,12 @@ The last exit is the primitive the draft defines.
 
 ## Alternatives and their costs
 
-### Fixed caps known in advance: prefer ARC
+### Fixed allowances known in advance: prefer an unlinkable capability
 
 When the desired cap is fixed in advance and can be enforced per credential or per
 issued artifact rather than per human, the contraction above never arises and a
-fixed-limit capability suffices without any per-human record. The cap ARC enforces is
-_per credential_, so it fits only when a fixed per-credential presentation
-limit is the actual requirement. ARC enforces such a cap cryptographically: client and
-server agree on a fixed presentation limit, presentations do not verify if the limits
-differ, presentations stay pairwise unlinkable up to that limit, and the server stores
-only the per-presentation tag for double-spend detection rather than a per-human row.
+fixed-limit capability suffices without any per-human record. ACT, for example,
+provides unlinkable credits for such a fixed allowance.
 
 ### Operator-mediated allocation
 
