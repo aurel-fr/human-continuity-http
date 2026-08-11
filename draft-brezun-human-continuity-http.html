@@ -7,7 +7,7 @@
 <title>Human Continuity for HTTP</title>
 <meta content="Aurélien Brézun" name="author">
 <meta content="
-       This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, the same human yields one verifier-local handle across all of their accounts, devices, and agents and cannot present as two, distinguishing the signal from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request. 
+       This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, valid presentations backed by the same human yield the same verifier-local handle, regardless of account, device, or agent, and cannot yield a second handle for that human. This differs from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request. 
        The framework is independent of any realm operator, credential technology, proof system, or definition of humanness. Companion profiles define artifact syntax, issuance, verification, challenge binding, replay behavior, holder binding, privacy properties, realm metadata, and verifier output. A conforming profile produces a verifier-local  continuity_handle  scoped to a realm, attestation audience, and purpose. This version defines no initial profile. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Brezun</td>
-<td class="center">Expires 7 February 2027</td>
+<td class="center">Expires 12 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-brezun-human-continuity-http-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-06" class="published">6 August 2026</time>
+<time datetime="2026-08-11" class="published">11 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-07">7 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-12">12 February 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1082,7 +1082,7 @@ svg {
 <h1 id="title">Human Continuity for HTTP</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, the same human yields one verifier-local handle across all of their accounts, devices, and agents and cannot present as two, distinguishing the signal from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document defines an HTTP extension for origins that need to attribute repeated participation to the same verified unique human within a declared continuity scope, without requiring a global human identifier or replacing existing authentication. Within a continuity scope, valid presentations backed by the same human yield the same verifier-local handle, regardless of account, device, or agent, and cannot yield a second handle for that human. This differs from authentication, which identifies a credential a human may hold many of. An origin server can publish policy for client-presented unique-human artifacts, issue an explicit challenge, and receive a client-presented artifact on a subsequent request.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">The framework is independent of any realm operator, credential technology, proof system, or definition of humanness. Companion profiles define artifact syntax, issuance, verification, challenge binding, replay behavior, holder binding, privacy properties, realm metadata, and verifier output. A conforming profile produces a verifier-local <code>continuity_handle</code> scoped to a realm, attestation audience, and purpose. This version defines no initial profile.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1119,7 +1119,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 7 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1263,9 +1263,6 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.4">
                 <p id="section-toc.1-1.10.2.4.1"><a href="#section-10.4" class="auto internal xref">10.4</a>.  <a href="#name-privacy-properties" class="internal xref">Privacy Properties</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.5">
-                <p id="section-toc.1-1.10.2.5.1"><a href="#section-10.5" class="auto internal xref">10.5</a>.  <a href="#name-example-profile-categories" class="internal xref">Example Profile Categories</a></p>
-</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
@@ -1369,9 +1366,6 @@ svg {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22.2.6">
                 <p id="section-toc.1-1.22.2.6.1"><a href="#section-22.6" class="auto internal xref">22.6</a>.  <a href="#name-using-verifier-output-in-or" class="internal xref">Using Verifier Output in Origin Policy</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22.2.7">
-                <p id="section-toc.1-1.22.2.7.1"><a href="#section-22.7" class="auto internal xref">22.7</a>.  <a href="#name-agent-delegation-binding" class="internal xref">Agent Delegation Binding</a></p>
-</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23">
@@ -1386,16 +1380,13 @@ svg {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.24">
-            <p id="section-toc.1-1.24.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-illustrative-profile-sketch" class="internal xref">Illustrative Profile Sketch</a></p>
+            <p id="section-toc.1-1.24.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.25">
-            <p id="section-toc.1-1.25.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
+            <p id="section-toc.1-1.25.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.26">
-            <p id="section-toc.1-1.26.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.27">
-            <p id="section-toc.1-1.27.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.26.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1478,8 +1469,7 @@ svg {
           <h4 id="name-relationship-to-web-bot-aut">
 <a href="#section-1.1.5" class="section-number selfRef">1.1.5. </a><a href="#name-relationship-to-web-bot-aut" class="section-name selfRef">Relationship to Web Bot Auth</a>
           </h4>
-<p id="section-1.1.5-1">Web Bot Auth <span>[<a href="#I-D.meunier-webbotauth-httpsig-protocol" class="cite xref">I-D.meunier-webbotauth-httpsig-protocol</a>]</span> authenticates the automated agent behind an HTTP request, using an HTTP Message Signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> with the <code>web-bot-auth</code> tag and signing keys discovered through an HTTP Message Signatures Directory <span>[<a href="#I-D.meunier-webbotauth-httpsig-directory" class="cite xref">I-D.meunier-webbotauth-httpsig-directory</a>]</span>. The two mechanisms are complementary: Web Bot Auth identifies the agent, and Human Continuity links those requests to the unique human on whose behalf it acts.<a href="#section-1.1.5-1" class="pilcrow">¶</a></p>
-<p id="section-1.1.5-2">The two compose on the same agent request as independent HTTP Message Signatures, each carrying its own <code>tag</code>: a <code>web-bot-auth</code> signature and a holder-bound <code>human-continuity</code> signature can coexist, and a verifier selects the <code>human-continuity</code> signature by its tag (<a href="#message-signature-requirements" class="auto internal xref">Section 11.2</a>, <span><a href="https://rfc-editor.org/rfc/rfc9421#section-7.2.7" class="relref">Section 7.2.7</a> of [<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>).<a href="#section-1.1.5-2" class="pilcrow">¶</a></p>
+<p id="section-1.1.5-1">Web Bot Auth <span>[<a href="#I-D.meunier-webbotauth-httpsig-protocol" class="cite xref">I-D.meunier-webbotauth-httpsig-protocol</a>]</span> authenticates the automated agent behind an HTTP request using an HTTP Message Signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> with the <code>web-bot-auth</code> tag; its verification-key discovery mechanisms include an HTTP Message Signatures Directory <span>[<a href="#I-D.meunier-webbotauth-httpsig-directory" class="cite xref">I-D.meunier-webbotauth-httpsig-directory</a>]</span>. A <code>web-bot-auth</code> signature and a holder-bound <code>human-continuity</code> signature can coexist on one request as independent HTTP Message Signatures, each with its own <code>tag</code>; a verifier selects the <code>human-continuity</code> signature by its tag (<a href="#message-signature-requirements" class="auto internal xref">Section 11.2</a>, <span><a href="https://rfc-editor.org/rfc/rfc9421#section-7.2.7" class="relref">Section 7.2.7</a> of [<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>).<a href="#section-1.1.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1493,9 +1483,9 @@ svg {
 <p id="section-1.2-2">Origins <span class="bcp14">SHOULD NOT</span> request <code>Human-Continuity</code> when an unlinkable authorization, redemption, rate-limit, or credit-spend mechanism is sufficient.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
 <p id="section-1.2-3">The boundary between this specification and unlinkable mechanisms turns on where policy state lives and when policy is applied. Unlinkable capability systems fix a spendable allowance at issuance and decide each redemption against the artifact rather than the human. Privacy Pass <span>[<a href="#RFC9576" class="cite xref">RFC9576</a>]</span>, the Privacy Pass HTTP authentication scheme <span>[<a href="#RFC9577" class="cite xref">RFC9577</a>]</span>, ARC <span>[<a href="#I-D.ietf-privacypass-arc-crypto" class="cite xref">I-D.ietf-privacypass-arc-crypto</a>]</span>, and ACT <span>[<a href="#I-D.schlesinger-cfrg-act" class="cite xref">I-D.schlesinger-cfrg-act</a>]</span> issue tokens, bounded-use credentials, or credits. At redemption time, the verifier asks only whether the bearer presents a still-valid, not-yet-exhausted capability: that the client is authorized to proceed, has satisfied an issuance precondition such as solving a CAPTCHA, holds a spendable token or credit, has not double-spent it, or is within an anonymous rate limit.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
 <p id="section-1.2-4"><code>Human-Continuity</code> instead allows policy to bind at decision time. The verifier can use mutable per-human state keyed by the resulting <code>continuity_handle</code> to recognize that a presentation is backed by the same verified unique human as an earlier presentation in the same declared continuity scope. That recognition is needed when a per-human rule may be applied, audited, or revised after artifacts are already in use. An unlinkable mechanism cannot express such a rule because it cannot distinguish repeated use by one human from use by several. Examples include duplicate account prevention, per-human quota grouping across accounts or sessions, Sybil-resistant participation, recovery-sensitive account workflows, grant or trial credit claims that require human continuity, and agent delegation policies that group activity by the backing human. For use cases involving allocation or abuse control, a scoped <code>continuity_handle</code> does not eliminate abuse; it changes the attacker's bottleneck from creating accounts to obtaining access to distinct verified humans.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
-<p id="section-1.2-5">Unlinkable token, credential, and credit systems often require the client to retain token, credential, presentation, balance, refund, or other protocol state. Such systems can be appropriate for short-lived or single-device use cases, such as solving a CAPTCHA and redeeming a small number of tokens. They can be less suitable when the origin requires long-lived continuity, multi-device use, or recovery after loss of client state. Those requirements are a primary motivation for verifier-local human continuity, but they also increase privacy risk and therefore require narrow continuity scopes.<a href="#section-1.2-5" class="pilcrow">¶</a></p>
+<p id="section-1.2-5">Unlinkable mechanisms that rely on client-retained tokens, credentials, or balances can suit short-lived or single-device use but be less suitable for long-lived, multi-device, or recoverable continuity. Support for those properties in this framework depends on the selected profile's state, recovery, and device continuity model (<a href="#profile-requirements" class="auto internal xref">Section 10</a>), increases privacy risk, and requires narrow continuity scopes.<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 <p id="section-1.2-6">A credential presentation alone shows that the subject holds a qualifying credential at presentation time. If that check suffices, a presentation protocol without this document is preferable.<a href="#section-1.2-6" class="pilcrow">¶</a></p>
-<p id="section-1.2-7">A client-stored linkable value, such as a long-lived cookie or bearer token, can also give a verifier a stable per-client value, but it derives its continuity from the client retaining and replaying one secret. A client can hold several such values to present as several distinct continuities, and losing the value loses the continuity. A <code>continuity_handle</code> instead derives from the verification of a unique human under a realm and is computed verifier-locally: within a scope a human has at most one, regardless of how many clients, accounts, or credentials they control, cannot obtain a second, and recovers the same value after loss of client state.<a href="#section-1.2-7" class="pilcrow">¶</a></p>
+<p id="section-1.2-7">A client-stored linkable value, such as a long-lived cookie or bearer token, derives its continuity from retaining and replaying one secret. A client can hold several such values to present as distinct continuities, and losing a value loses that continuity. A <code>continuity_handle</code> instead derives from verification of a unique human under a realm and is computed verifier-locally. Within a scope, valid presentations backed by the same verified human produce the same handle, regardless of the clients, accounts, or credentials used (<a href="#continuity-handle-requirements" class="auto internal xref">Section 10.3</a>). After loss of client state, any further valid presentation produces that handle; the selected profile defines whether such a presentation remains possible (<a href="#profile-requirements" class="auto internal xref">Section 10</a>).<a href="#section-1.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1803,7 +1793,7 @@ When per-request unlinkability is desired, <code>Human-Continuity</code> is the 
 <p id="section-6.4-22">Clients <span class="bcp14">MUST</span> ignore any challenge whose purpose value is absent or syntactically invalid or that is not authorized by policy metadata (<a href="#metadata-authorization" class="auto internal xref">Section 8.4</a>).<a href="#section-6.4-22" class="pilcrow">¶</a></p>
 <p id="section-6.4-23">Verifiers <span class="bcp14">MUST NOT</span> treat presentations as valid unless the presentation is authorized by policy metadata (<a href="#metadata-authorization" class="auto internal xref">Section 8.4</a>), the purpose value is present and syntactically valid, the purpose value is accepted by origin policy for the request, and the artifact is bound to that purpose according to the selected profile.<a href="#section-6.4-23" class="pilcrow">¶</a></p>
 <p id="section-6.4-24">Examples:<a href="#section-6.4-24" class="pilcrow">¶</a></p>
-<p id="section-6.4-25">The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and <code>Signature</code> values are illustrative placeholders. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in <a href="#examples" class="auto internal xref">Section 22</a>.<a href="#section-6.4-25" class="pilcrow">¶</a></p>
+<p id="section-6.4-25">The examples below show the exchange first, then the policy metadata checked to derive the effective values. The abbreviated metadata is complete for the shown request method and path, with unrelated non-matching entries omitted. Example artifact and <code>Signature</code> values are illustrative placeholders, and the profile identifier "com.example.unique-human.v1" used throughout names a fictional profile. A real artifact is bound to one effective realm, effective attestation audience, and purpose, and the same artifact bytes would not be valid across the different continuity scopes shown in this document's examples. Additional end-to-end flows against a consolidated policy metadata document are shown in <a href="#examples" class="auto internal xref">Section 22</a>.<a href="#section-6.4-25" class="pilcrow">¶</a></p>
 <p id="section-6.4-26">Example 1: default policy selector with origin-scoped policy<a href="#section-6.4-26" class="pilcrow">¶</a></p>
 <p id="section-6.4-27">For a GET request to:<a href="#section-6.4-27" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-28">
@@ -1846,46 +1836,27 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
 }
 </pre><a href="#section-6.4-32" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-33">Effective policy identifier:<a href="#section-6.4-33" class="pilcrow">¶</a></p>
+<p id="section-6.4-33">Effective values and continuity scope:<a href="#section-6.4-33" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-34">
 <pre>
-site
+effective policy identifier:    site
+effective realm:                https://realm.example
+effective attestation audience: https://service.example
+purpose:                        site_rate_limit
+continuity scope:
+  (https://realm.example, https://service.example, site_rate_limit)
 </pre><a href="#section-6.4-34" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-35">Effective realm:<a href="#section-6.4-35" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-36">
-<pre>
-https://realm.example
-</pre><a href="#section-6.4-36" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-37">Effective attestation audience:<a href="#section-6.4-37" class="pilcrow">¶</a></p>
+<p id="section-6.4-35">No policy selector is found for GET /accounts/free-tier, so the GET default policy selector selects the site policy. The effective attestation audience is the canonical HTTPS origin of the request.<a href="#section-6.4-35" class="pilcrow">¶</a></p>
+<p id="section-6.4-36">Example 2: purpose template for a single-endpoint API<a href="#section-6.4-36" class="pilcrow">¶</a></p>
+<p id="section-6.4-37">For a POST request to:<a href="#section-6.4-37" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-6.4-38">
 <pre>
-https://service.example
+https://api.example.com/graphql
 </pre><a href="#section-6.4-38" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-39">Purpose:<a href="#section-6.4-39" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-40">
-<pre>
-site_rate_limit
-</pre><a href="#section-6.4-40" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-41">Continuity scope:<a href="#section-6.4-41" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-42">
-<pre>
-(https://realm.example, https://service.example, site_rate_limit)
-</pre><a href="#section-6.4-42" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-43">No policy selector is found for GET /accounts/free-tier, so the GET default policy selector selects the site policy. The effective attestation audience is the canonical HTTPS origin of the request.<a href="#section-6.4-43" class="pilcrow">¶</a></p>
-<p id="section-6.4-44">Example 2: purpose template for a single-endpoint API<a href="#section-6.4-44" class="pilcrow">¶</a></p>
-<p id="section-6.4-45">For a POST request to:<a href="#section-6.4-45" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-46">
-<pre>
-https://api.example.com/graphql
-</pre><a href="#section-6.4-46" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-47">HTTP field in the response:<a href="#section-6.4-47" class="pilcrow">¶</a></p>
-<div class="lang-http-message sourcecode" id="section-6.4-48">
+<p id="section-6.4-39">HTTP field in the response:<a href="#section-6.4-39" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-6.4-40">
 <pre>
 NOTE: '\' line wrapping per RFC 8792
 
@@ -1893,10 +1864,10 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
   purpose="promo:summer-sale"; \
   challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
   presentation-assurance="subject-present"
-</pre><a href="#section-6.4-48" class="pilcrow">¶</a>
+</pre><a href="#section-6.4-40" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-49">Relevant policy metadata:<a href="#section-6.4-49" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-6.4-50">
+<p id="section-6.4-41">Relevant policy metadata:<a href="#section-6.4-41" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6.4-42">
 <pre>
 {
   "origin": "https://api.example.com",
@@ -1929,23 +1900,19 @@ Human-Continuity-Challenge: "com.example.unique-human.v1"; \
     }
   }
 }
-</pre><a href="#section-6.4-50" class="pilcrow">¶</a>
+</pre><a href="#section-6.4-42" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-51">The POST /graphql request selects the GraphQL policy. The concrete purpose "promo:summer-sale" does not equal any purpose listed under the policy, so the "promo:{campaign}" purpose template authorizes it and selects the realm, profile entry, and presentation-assurance value. For the concrete purpose "promo:loyalty", the exactly matching purpose takes precedence even though the purpose template also matches it: its purpose entry applies, including its "human-verified" presentation-assurance value, with no fallback to the purpose template's purpose entry. The concrete purpose, not the purpose template, is part of the continuity scope. A purpose template authorizes concrete purpose values; the concrete purpose itself is always carried in the challenge.<a href="#section-6.4-51" class="pilcrow">¶</a></p>
-<p id="section-6.4-52">Selected presentation-assurance value:<a href="#section-6.4-52" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-53">
+<p id="section-6.4-43">The POST /graphql request selects the GraphQL policy. The concrete purpose "promo:summer-sale" does not equal any purpose listed under the policy, so the "promo:{campaign}" purpose template authorizes it and selects the realm, profile entry, and presentation-assurance value. For the concrete purpose "promo:loyalty", the exactly matching purpose takes precedence even though the purpose template also matches it: its purpose entry applies, including its "human-verified" presentation-assurance value, with no fallback to the purpose template's purpose entry. The concrete purpose, not the purpose template, is part of the continuity scope. A purpose template authorizes concrete purpose values; the concrete purpose itself is always carried in the challenge.<a href="#section-6.4-43" class="pilcrow">¶</a></p>
+<p id="section-6.4-44">Selected presentation-assurance value and continuity scope:<a href="#section-6.4-44" class="pilcrow">¶</a></p>
+<div class="lang-text sourcecode" id="section-6.4-45">
 <pre>
-subject-present
-</pre><a href="#section-6.4-53" class="pilcrow">¶</a>
+selected presentation-assurance value: subject-present
+continuity scope:
+  (https://realm.example, https://api.example.com, promo:summer-sale)
+</pre><a href="#section-6.4-45" class="pilcrow">¶</a>
 </div>
-<p id="section-6.4-54">Continuity scope:<a href="#section-6.4-54" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-6.4-55">
-<pre>
-(https://realm.example, https://api.example.com, promo:summer-sale)
-</pre><a href="#section-6.4-55" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-56">When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:<a href="#section-6.4-56" class="pilcrow">¶</a></p>
-<div class="lang-http-message sourcecode" id="section-6.4-57">
+<p id="section-6.4-46">When the client retries an operation-specific request with content, it includes request content coverage in the HTTP Message Signature:<a href="#section-6.4-46" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-6.4-47">
 <pre>
 NOTE: '\' line wrapping per RFC 8792
 
@@ -1971,7 +1938,7 @@ Signature: hu=:bidcWjspV0fNiGmSb4/Gz1YNNOovQ6x1vykhJqOlMOGEpMw89IZz\
   "variables": {"c": "summer-sale"},
   "query": "mutation Claim($c: ID!) { claim(campaign: $c) { ok } }"
 }
-</pre><a href="#section-6.4-57" class="pilcrow">¶</a>
+</pre><a href="#section-6.4-47" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2175,7 +2142,7 @@ https://example.com/.well-known/human-continuity
 <p id="section-8.3-21">profiles: <span class="bcp14">REQUIRED</span> non-empty object. Each member is a profile entry whose name is a profile identifier and whose value describes how that profile can be used with this policy and purpose entry.<a href="#section-8.3-21" class="pilcrow">¶</a></p>
 <p id="section-8.3-22">Profile identifiers in policy metadata use the syntax defined in <a href="#profile-identifiers" class="auto internal xref">Section 10.1</a>. They are case-sensitive and compared by exact string equality.<a href="#section-8.3-22" class="pilcrow">¶</a></p>
 <p id="section-8.3-23">Each profile entry has the following members.<a href="#section-8.3-23" class="pilcrow">¶</a></p>
-<p id="section-8.3-24">presentation_assurances: <span class="bcp14">OPTIONAL</span> non-empty array of unique strings. The presentation-assurance values directly authorized for this profile entry. A directly authorized value can be requested in Human-Continuity-Challenge or asserted in Human-Continuity even when the challenge did not request it. If omitted, policy metadata does not authorize presentation-assurance support for this profile entry.<a href="#section-8.3-24" class="pilcrow">¶</a></p>
+<p id="section-8.3-24">presentation_assurances: <span class="bcp14">OPTIONAL</span> array. If present, it <span class="bcp14">MUST</span> consist of one or more unique strings, each satisfying the presentation-assurance value syntax in <a href="#presentation-assurance" class="auto internal xref">Section 7.5</a>. Each value is directly authorized for this profile entry and can be requested in Human-Continuity-Challenge or asserted in Human-Continuity even if the challenge did not request it. If omitted, policy metadata does not authorize presentation-assurance support for this profile entry.<a href="#section-8.3-24" class="pilcrow">¶</a></p>
 <p id="section-8.3-25">Profile entries are the profile-scoped extension point (<a href="#metadata-precedence" class="auto internal xref">Section 8.5</a>).<a href="#section-8.3-25" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2404,23 +2371,6 @@ https://realm.example/.well-known/human-continuity-realm
 <p id="section-10.4-6">realm_operator_purpose_visibility: Whether the realm operator learns no purpose, the purpose at issuance, the purpose at redemption, or profile-defined purpose information.<a href="#section-10.4-6" class="pilcrow">¶</a></p>
 <p id="section-10.4-7">realm_operator_challenge_visibility: Whether the realm operator learns no challenge nonce, the challenge nonce at issuance, the challenge nonce at redemption, or profile-defined challenge nonce information.<a href="#section-10.4-7" class="pilcrow">¶</a></p>
 <p id="section-10.4-8">realm_metadata_fetch_visibility: What client information, if any, is revealed while obtaining realm metadata for the profile.<a href="#section-10.4-8" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="example-profile-categories">
-<section id="section-10.5">
-        <h3 id="name-example-profile-categories">
-<a href="#section-10.5" class="section-number selfRef">10.5. </a><a href="#name-example-profile-categories" class="section-name selfRef">Example Profile Categories</a>
-        </h3>
-<p id="section-10.5-1">This section is informative. It gives examples of companion profile categories for early discussion. These examples are illustrative only; a real profile can combine these patterns.<a href="#section-10.5-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-10.5-2.1">
-            <p id="section-10.5-2.1.1">Unique-human profiles based on accounts or registries. Such a profile would define how a holder proves control of, or membership in, a unique-human account or registry entry. The profile would define how the verifier's origin policy context is mapped to realm, attestation audience, and purpose, how the resulting nullifier or equivalent scope-local value is exposed as <code>continuity_handle</code>, and what replay, holder binding, recovery, and privacy properties verifiers can rely on.<a href="#section-10.5-2.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-10.5-2.2">
-            <p id="section-10.5-2.2.1">Proof profiles backed by credentials or certificates. Such a profile would define how a holder proves possession of a qualifying credential, certificate, or attestation signed by the realm operator. The profile would define the artifact format, realm operator trust model, verifier algorithm, revocation handling, holder binding, replay behavior, lifecycle behavior, and derivation of a scoped <code>continuity_handle</code>.<a href="#section-10.5-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-10.5-3">Other realm operators, credential systems, proof systems, and issuance ceremonies can define profiles without changing the HTTP fields, policy metadata, realm metadata, or core verifier output model defined here.<a href="#section-10.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3097,7 +3047,7 @@ Signature: hu=:DohOIdStKJj731Yk4BdjDWOxctbp7v00WLXYWrIc8Ryi/WsDT+7Ri\
   TXTU+U6Fa6aOUFYF83ZTHBSMX1N0Q4MCQ==:
 </pre><a href="#section-22.2-6" class="pilcrow">¶</a>
 </div>
-<p id="section-22.2-7">The challenge above carried a challenge nonce. The challenge nonce evidence required by <a href="#freshness-replay" class="auto internal xref">Section 11.3</a> is carried inside the artifact according to the fictional profile; it does not appear as a Signature-Input parameter.<a href="#section-22.2-7" class="pilcrow">¶</a></p>
+<p id="section-22.2-7">The challenge above carried a challenge nonce. The challenge nonce evidence required by <a href="#freshness-replay" class="auto internal xref">Section 11.3</a> is carried inside the artifact according to the example profile; it does not appear as a Signature-Input parameter.<a href="#section-22.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="policy-metadata">
@@ -3237,32 +3187,6 @@ UNIQUE (
 <p id="section-22.6-4"><code>stored_continuity_handle</code> is policy state, not an authenticator. It can be the raw <code>continuity_handle</code> or, preferably for persistent storage, a verifier-local protected derivative. Account access still depends on the origin's native authentication and authorization mechanisms.<a href="#section-22.6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="agent-delegation-binding">
-<section id="section-22.7">
-        <h3 id="name-agent-delegation-binding">
-<a href="#section-22.7" class="section-number selfRef">22.7. </a><a href="#name-agent-delegation-binding" class="section-name selfRef">Agent Delegation Binding</a>
-        </h3>
-<p id="section-22.7-1">For agent delegation, a verifier can use a separate purpose and bind agent keys to the resulting <code>continuity_handle</code>:<a href="#section-22.7-1" class="pilcrow">¶</a></p>
-<div class="lang-text sourcecode" id="section-22.7-2">
-<pre>
-purpose = agent_delegation
-</pre><a href="#section-22.7-2" class="pilcrow">¶</a>
-</div>
-<div class="lang-text sourcecode" id="section-22.7-3">
-<pre>
-human_agent_delegations (
-  realm,
-  attestation_audience,
-  purpose,
-  stored_continuity_handle,
-  agent_key_thumbprint,
-  account_id,
-  expires_at
-)
-</pre><a href="#section-22.7-3" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 </section>
 </div>
 <div id="sec-combined-references">
@@ -3357,7 +3281,7 @@ human_agent_delegations (
 <dd class="break"></dd>
 <dt id="I-D.meunier-webbotauth-httpsig-protocol">[I-D.meunier-webbotauth-httpsig-protocol]</dt>
         <dd>
-<span class="refAuthor">Meunier, T.</span> and <span class="refAuthor">S. Major</span>, <span class="refTitle">"HTTP Message Signatures for automated traffic"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-webbotauth-httpsig-protocol-00</span>, <time datetime="2026-06-26" class="refDate">26 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-webbotauth-httpsig-protocol-00">https://datatracker.ietf.org/doc/html/draft-meunier-webbotauth-httpsig-protocol-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Meunier, T.</span> and <span class="refAuthor">S. Major</span>, <span class="refTitle">"HTTP Message Signatures for automated traffic"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-webbotauth-httpsig-protocol-01</span>, <time datetime="2026-08-05" class="refDate">5 August 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-webbotauth-httpsig-protocol-01">https://datatracker.ietf.org/doc/html/draft-meunier-webbotauth-httpsig-protocol-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.schlesinger-cfrg-act">[I-D.schlesinger-cfrg-act]</dt>
         <dd>
@@ -3420,84 +3344,51 @@ human_agent_delegations (
 </div>
 </section>
 </div>
-<div id="illustrative-profile-sketch">
-<section id="appendix-A">
-      <h2 id="name-illustrative-profile-sketch">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-illustrative-profile-sketch" class="section-name selfRef">Illustrative Profile Sketch</a>
-      </h2>
-<p id="appendix-A-1">This appendix is informative. It is not a complete profile specification and is not sufficient for deployment. It exists only to illustrate how a companion profile would use the HTTP framework.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">The example profile "com.example.unique-human.v1" is fictional. It defines an opaque artifact that proves, according to the profile's verification rules, that the subject satisfies the profile's unique-human criteria. The artifact is valid for one attestation audience and one purpose. Verification produces a scope-local <code>continuity_handle</code>.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
-<p id="appendix-A-3">Example challenge:<a href="#appendix-A-3" class="pilcrow">¶</a></p>
-<div class="lang-http-message sourcecode" id="appendix-A-4">
-<pre>
-NOTE: '\' line wrapping per RFC 8792
-
-Human-Continuity-Challenge: "com.example.unique-human.v1"; \
-  purpose="free_tier_signup"; \
-  challenge=:9m2RXkyoGnXRLStCQSxKfj1awEL1SGQ7QPgo/opWHsY=:; \
-  presentation-assurance="subject-present"
-</pre><a href="#appendix-A-4" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A-5">Example presentation:<a href="#appendix-A-5" class="pilcrow">¶</a></p>
-<div class="lang-http-message sourcecode" id="appendix-A-6">
-<pre>
-NOTE: '\' line wrapping per RFC 8792
-
-Human-Continuity: "com.example.unique-human.v1"; \
-  artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
-  purpose="free_tier_signup"; \
-  presentation-assurance="subject-present"
-</pre><a href="#appendix-A-6" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A-7">A successful verification produces the verifier output shown in <a href="#verifier-behavior" class="auto internal xref">Section 13</a>, with <code>state</code> set to "valid" and a scope-local <code>continuity_handle</code> for the selected continuity scope.<a href="#appendix-A-7" class="pilcrow">¶</a></p>
-<p id="appendix-A-8">A real profile would still need to define artifact syntax, issuance, verification, holder binding, challenge nonce binding, supported presentation-assurance values, replay behavior, revocation, lifecycle events, privacy properties, and <code>continuity_handle</code> derivation.<a href="#appendix-A-8" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="open-issues">
-<section id="appendix-B">
+<section id="appendix-A">
       <h2 id="name-open-issues">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
       </h2>
-<p id="appendix-B-1">RFC Editor: Please remove this section before publication.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">The following issues are intentionally left for discussion:<a href="#appendix-B-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="appendix-B-3">
-<li id="appendix-B-3.1">
-          <p id="appendix-B-3.1.1">Whether future revisions should add path template matching or keep only exact and terminal subtree path patterns.<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">RFC Editor: Please remove this section before publication.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">The following issues are intentionally left for discussion:<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-A-3">
+<li id="appendix-A-3.1">
+          <p id="appendix-A-3.1.1">Whether future revisions should add path template matching or keep only exact and terminal subtree path patterns.<a href="#appendix-A-3.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.2">
-          <p id="appendix-B-3.2.1">Whether purpose templates need additional privacy constraints or richer matching syntax beyond exact string prefixes.<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.2">
+          <p id="appendix-A-3.2.1">Whether purpose templates need additional privacy constraints or richer matching syntax beyond exact string prefixes.<a href="#appendix-A-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Whether clients should learn the challenge acceptance mode or validity interval.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.3">
+          <p id="appendix-A-3.3.1">Whether clients should learn the challenge acceptance mode or validity interval.<a href="#appendix-A-3.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.4">
-          <p id="appendix-B-3.4.1">Clock skew defaults for browser, mobile, embedded, and agent deployments.<a href="#appendix-B-3.4.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.4">
+          <p id="appendix-A-3.4.1">Clock skew defaults for browser, mobile, embedded, and agent deployments.<a href="#appendix-A-3.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.5">
-          <p id="appendix-B-3.5.1">Whether future revisions should use Accept-Signature for dynamic covered component negotiation.<a href="#appendix-B-3.5.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.5">
+          <p id="appendix-A-3.5.1">Whether future revisions should use Accept-Signature for dynamic covered component negotiation.<a href="#appendix-A-3.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.6">
-          <p id="appendix-B-3.6.1">Whether one or more companion profile drafts should be published with this document to demonstrate interoperability across independent realm operator designs.<a href="#appendix-B-3.6.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.6">
+          <p id="appendix-A-3.6.1">Whether one or more companion profile drafts should be published with this document to demonstrate interoperability across independent realm operator designs.<a href="#appendix-A-3.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="appendix-B-3.7">
-          <p id="appendix-B-3.7.1">Whether future revisions should introduce attestation audiences other than the canonical HTTPS origin of the request, either same-origin audiences narrowed within an origin at issuance time, or delegated cross-origin audiences, and under what rules for realm visibility and delegation trust.<a href="#appendix-B-3.7.1" class="pilcrow">¶</a></p>
+        <li id="appendix-A-3.7">
+          <p id="appendix-A-3.7.1">Whether future revisions should introduce attestation audiences other than the canonical HTTPS origin of the request, either same-origin audiences narrowed within an origin at issuance time, or delegated cross-origin audiences, and under what rules for realm visibility and delegation trust.<a href="#appendix-A-3.7.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
 </div>
 <div id="acknowledgements">
-<section id="appendix-C">
+<section id="appendix-B">
       <h2 id="name-acknowledgements">
 <a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-C-1">This document is informed by prior work on HTTP Structured Fields, HTTP Message
+<p id="appendix-B-1">This document is informed by prior work on HTTP Structured Fields, HTTP Message
 Signatures, well-known metadata, OAuth 2.0 Protected Resource Metadata, and
 Privacy Pass. The editor thanks the authors and contributors of those
-specifications.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+specifications.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
+<section id="appendix-C">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
