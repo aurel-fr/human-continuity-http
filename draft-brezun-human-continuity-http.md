@@ -150,7 +150,7 @@ Web Bot Auth {{I-D.meunier-webbotauth-httpsig-protocol}} authenticates the autom
 
 This specification is intended for origins that require verifier-local human continuity within a declared continuity scope. A successful presentation intentionally allows the verifier to determine that repeated presentations within the same `(realm, attestation audience, purpose)` tuple are backed by the same verified unique human, without requiring a global human identifier.
 
-Origins SHOULD NOT request `Human-Continuity` when an unlinkable authorization, redemption, rate-limit, or credit-spend mechanism is sufficient.
+Origins SHOULD NOT request `Human-Continuity` when an unlinkable authorization, redemption, or credit-spend mechanism is sufficient.
 
 The boundary between this specification and unlinkable mechanisms turns on where policy state lives and when policy is applied. Unlinkable capability systems fix a spendable allowance at issuance and decide each redemption against the artifact rather than the human. Privacy Pass {{RFC9576}}, the Privacy Pass HTTP authentication scheme {{RFC9577}}, and ACT {{I-D.schlesinger-cfrg-act}} issue tokens or credits. At redemption time, the verifier asks only whether the bearer presents a still-valid, not-yet-exhausted capability: that the client is authorized to proceed, has satisfied an issuance precondition such as solving a CAPTCHA, holds a spendable token or credit, or has not double-spent it.
 

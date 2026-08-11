@@ -61,10 +61,8 @@ The last exit is the primitive the draft defines.
 
 When the desired cap is fixed in advance and can be enforced per credential or per
 issued artifact rather than per human, the contraction above never arises and a
-fixed-limit capability suffices without any per-human record. This fits only when a
-fixed per-credential or per-artifact limit is the actual requirement; it does not
-support a rule that later contracts based on the holder's prior activity across an
-open-ended event history.
+fixed-limit capability suffices without any per-human record. ACT, for example,
+provides unlinkable credits for such a fixed allowance.
 
 ### Operator-mediated allocation
 
