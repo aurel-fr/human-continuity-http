@@ -84,7 +84,7 @@ Table of Contents
 
    1.  Introduction
      1.1.  Relationship to Existing Work
-       1.1.1.  Relationship to Privacy Pass, ARC, and ACT
+       1.1.1.  Relationship to Privacy Pass and ACT
        1.1.2.  Relationship to OAuth Protected Resource Metadata
        1.1.3.  Relationship to HTTP Authentication Schemes
        1.1.4.  Relationship to Credential Presentation Protocols
@@ -232,16 +232,15 @@ Table of Contents
 
 1.1.  Relationship to Existing Work
 
-1.1.1.  Relationship to Privacy Pass, ARC, and ACT
+1.1.1.  Relationship to Privacy Pass and ACT
 
    Privacy Pass [RFC9576] provides privacy-preserving token issuance and
    redemption for cases where the origin should learn an unlinkable fact
-   rather than a stable continuity value.  Anonymous Rate-Limited
-   Credentials (ARC) [I-D.ietf-privacypass-arc-crypto] similarly support
-   unlinkable rate limiting, and Anonymous Credit Tokens (ACT)
-   [I-D.schlesinger-cfrg-act] unlinkable credit issuance and spending.
-   These mechanisms are complementary to this specification: Section 1.2
-   defines the boundary between them and scoped human continuity.
+   rather than a stable continuity value.  Anonymous Credit Tokens (ACT)
+   [I-D.schlesinger-cfrg-act] support unlinkable credit issuance and
+   spending.  These mechanisms are complementary to this specification:
+   Section 1.2 defines the boundary between them and scoped human
+   continuity.
 
 1.1.2.  Relationship to OAuth Protected Resource Metadata
 
@@ -326,22 +325,19 @@ Table of Contents
    unique human, without requiring a global human identifier.
 
    Origins SHOULD NOT request Human-Continuity when an unlinkable
-   authorization, redemption, rate-limit, or credit-spend mechanism is
-   sufficient.
+   authorization, redemption, or credit-spend mechanism is sufficient.
 
    The boundary between this specification and unlinkable mechanisms
    turns on where policy state lives and when policy is applied.
    Unlinkable capability systems fix a spendable allowance at issuance
    and decide each redemption against the artifact rather than the
    human.  Privacy Pass [RFC9576], the Privacy Pass HTTP authentication
-   scheme [RFC9577], ARC [I-D.ietf-privacypass-arc-crypto], and ACT
-   [I-D.schlesinger-cfrg-act] issue tokens, bounded-use credentials, or
+   scheme [RFC9577], and ACT [I-D.schlesinger-cfrg-act] issue tokens or
    credits.  At redemption time, the verifier asks only whether the
    bearer presents a still-valid, not-yet-exhausted capability: that the
    client is authorized to proceed, has satisfied an issuance
    precondition such as solving a CAPTCHA, holds a spendable token or
-   credit, has not double-spent it, or is within an anonymous rate
-   limit.
+   credit, or has not double-spent it.
 
    Human-Continuity instead allows policy to bind at decision time.  The
    verifier can use mutable per-human state keyed by the resulting
@@ -3473,13 +3469,6 @@ Table of Contents
    [DC-API]   W3C Federated Identity Working Group, "Digital Credentials
               API", July 2026,
               <https://www.w3.org/TR/digital-credentials/>.
-
-   [I-D.ietf-privacypass-arc-crypto]
-              Yun, C., Wood, C. A., and A. F. Faz-Hernandez, "Anonymous
-              Rate-Limited Credentials Cryptography", Work in Progress,
-              Internet-Draft, draft-ietf-privacypass-arc-crypto-01, 2
-              March 2026, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-privacypass-arc-crypto-01>.
 
    [I-D.irtf-cfrg-bbs-per-verifier-linkability]
               Kalos, V. and G. M. Bernstein, "BBS per Verifier
