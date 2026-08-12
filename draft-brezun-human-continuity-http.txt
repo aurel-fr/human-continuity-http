@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                          11 August 2026
-Expires: 12 February 2027
+Intended status: Standards Track                          12 August 2026
+Expires: 13 February 2027
 
 
                        Human Continuity for HTTP
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 February 2027.
+   This Internet-Draft will expire on 13 February 2027.
 
 Copyright Notice
 
@@ -376,9 +376,9 @@ Table of Contents
    under a realm and is computed verifier-locally.  Within a scope,
    valid presentations backed by the same verified human produce the
    same handle, regardless of the clients, accounts, or credentials used
-   (Section 10.3).  After loss of client state, any further valid
-   presentation produces that handle; the selected profile defines
-   whether such a presentation remains possible (Section 10).
+   (Section 10.3).  After loss of client state, the selected profile
+   defines whether another valid presentation remains possible; if so,
+   it produces the same scoped handle (Section 10).
 
 2.  Conventions and Terminology
 
@@ -2476,10 +2476,12 @@ Table of Contents
    requested or asserted presentation-assurance evidence, reuses an
    applicable replay key, or otherwise fails profile validation.
 
-   unverifiable: The verifier lacks fresh enough metadata, does not
-   support the profile, does not trust the realm, lacks verification
-   material, cannot access required authoritative challenge or replay
-   state, or otherwise cannot complete validation.
+   unverifiable: Validation cannot complete.  Examples include missing
+   or malformed input required to attempt verification; unavailable or
+   unusable policy or realm metadata; unavailable authoritative
+   challenge or replay state, including inability to complete a replay
+   check atomically; an unsupported profile, algorithm, or capability;
+   or an untrusted realm.
 
    This document does not require an origin to fail a request when a
    human-continuity presentation is missing, invalid, or unverifiable.
@@ -2537,11 +2539,9 @@ Table of Contents
    origin policy after applying the origin's native authentication,
    authorization, or account recovery rules.
 
-   A verifier output MAY include profile-defined or implementation-
-   defined diagnostic information describing why a presentation was
-   invalid or unverifiable.  Where an origin surfaces such a reason in
-   an HTTP response, one possible representation is Problem Details
-   [RFC9457].
+   Verifier output MAY report profile- or implementation-defined invalid
+   reasons or unverifiable causes beneath the top-level state.  Origins
+   can surface them as Problem Details [RFC9457].
 
 14.  Caching and Intermediaries
 
