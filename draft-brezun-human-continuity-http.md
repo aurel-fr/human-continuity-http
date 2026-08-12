@@ -1234,7 +1234,7 @@ valid: The artifact and all required presentation proofs are valid, and the veri
 
 invalid: The artifact or presentation proof is malformed, expired, revoked, bound to a different realm, attestation audience, or purpose, bound to a challenge nonce the verifier did not issue or no longer accepts, fails to produce a required `continuity_handle` or requested or asserted presentation-assurance evidence, reuses an applicable replay key, or otherwise fails profile validation.
 
-unverifiable: The verifier lacks fresh enough metadata, does not support the profile, does not trust the realm, lacks verification material, cannot access required authoritative challenge or replay state, or otherwise cannot complete validation.
+unverifiable: Validation cannot complete. Examples include missing or malformed input required to attempt verification; unavailable or unusable policy or realm metadata; unavailable authoritative challenge or replay state, including inability to complete a replay check atomically; an unsupported profile, algorithm, or capability; or an untrusted realm.
 
 This document does not require an origin to fail a request when a human-continuity presentation is missing, invalid, or unverifiable. Origin policy is out of scope.
 
@@ -1275,7 +1275,7 @@ A verifier MUST NOT use a valid/invalid attestation result alone to enforce poli
 
 A `continuity_handle` is not an authenticator. A verifier MUST NOT use a `continuity_handle`, or equality with a previously stored `continuity_handle` value or derivative, as the sole basis for authenticating a request, granting account access, or proving control of an account. A verifier MAY use a `continuity_handle` as an input to origin policy after applying the origin's native authentication, authorization, or account recovery rules.
 
-A verifier output MAY include profile-defined or implementation-defined diagnostic information describing why a presentation was invalid or unverifiable. Where an origin surfaces such a reason in an HTTP response, one possible representation is Problem Details {{RFC9457}}.
+Verifier output MAY report profile- or implementation-defined `invalid` reasons or `unverifiable` causes beneath the top-level state. Origins can surface them as Problem Details {{RFC9457}}.
 
 # Caching and Intermediaries
 
