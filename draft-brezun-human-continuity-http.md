@@ -56,8 +56,8 @@ informative:
   RFC9577:
   RFC9728:
   I-D.irtf-cfrg-bbs-per-verifier-linkability:
-  I-D.meunier-webbotauth-httpsig-directory:
   I-D.meunier-webbotauth-httpsig-protocol:
+  I-D.meunier-webbotauth-registry:
   I-D.schlesinger-cfrg-act:
   OpenID4VP:
     target: https://openid.net/specs/openid-4-verifiable-presentations-1_0.html
@@ -144,7 +144,7 @@ Version 0.2.0 of x401 {{X401}} gates a route on a verifier-composed, nonce-beari
 
 ### Relationship to Web Bot Auth
 
-Web Bot Auth {{I-D.meunier-webbotauth-httpsig-protocol}} authenticates the automated agent behind an HTTP request using an HTTP Message Signature {{RFC9421}} with the `web-bot-auth` tag; its verification-key discovery mechanisms include an HTTP Message Signatures Directory {{I-D.meunier-webbotauth-httpsig-directory}}. A `web-bot-auth` signature and a holder-bound `human-continuity` signature can coexist on one request as independent HTTP Message Signatures, each with its own `tag`; a verifier selects the `human-continuity` signature by its tag ({{message-signature-requirements}}, {{Section 7.2.7 of RFC9421}}).
+Web Bot Auth {{I-D.meunier-webbotauth-httpsig-protocol}} authenticates the automated agent behind an HTTP request using an HTTP Message Signature {{RFC9421}} tagged `web-bot-auth` and uses `Signature-Agent` for in-band verification-key discovery. Signature Agent Cards describe the signing agent and can be listed in registries {{I-D.meunier-webbotauth-registry}}. A `web-bot-auth` signature and a holder-bound `human-continuity` signature can coexist on one request as independent HTTP Message Signatures, each with its own `tag`; a verifier selects the `human-continuity` signature by its tag ({{message-signature-requirements}}, {{Section 7.2.7 of RFC9421}}).
 
 ## Applicability and Alternatives {#applicability}
 
