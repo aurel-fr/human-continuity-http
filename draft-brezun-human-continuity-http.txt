@@ -307,12 +307,13 @@ Table of Contents
 
    Web Bot Auth [I-D.meunier-webbotauth-httpsig-protocol] authenticates
    the automated agent behind an HTTP request using an HTTP Message
-   Signature [RFC9421] with the web-bot-auth tag; its verification-key
-   discovery mechanisms include an HTTP Message Signatures Directory
-   [I-D.meunier-webbotauth-httpsig-directory].  A web-bot-auth signature
-   and a holder-bound human-continuity signature can coexist on one
-   request as independent HTTP Message Signatures, each with its own
-   tag; a verifier selects the human-continuity signature by its tag
+   Signature [RFC9421] tagged web-bot-auth and uses Signature-Agent for
+   in-band verification-key discovery.  Signature Agent Cards describe
+   the signing agent and can be listed in registries
+   [I-D.meunier-webbotauth-registry].  A web-bot-auth signature and a
+   holder-bound human-continuity signature can coexist on one request as
+   independent HTTP Message Signatures, each with its own tag; a
+   verifier selects the human-continuity signature by its tag
    (Section 11.2, Section 7.2.7 of [RFC9421]).
 
 1.2.  Applicability and Alternatives
@@ -3477,19 +3478,19 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
               bbs-per-verifier-linkability-03>.
 
-   [I-D.meunier-webbotauth-httpsig-directory]
-              Meunier, T. and S. Major, "HTTP Message Signatures
-              Directory", Work in Progress, Internet-Draft, draft-
-              meunier-webbotauth-httpsig-directory-00, 26 June 2026,
-              <https://datatracker.ietf.org/doc/html/draft-meunier-
-              webbotauth-httpsig-directory-00>.
-
    [I-D.meunier-webbotauth-httpsig-protocol]
               Meunier, T. and S. Major, "HTTP Message Signatures for
               automated traffic", Work in Progress, Internet-Draft,
               draft-meunier-webbotauth-httpsig-protocol-01, 5 August
               2026, <https://datatracker.ietf.org/doc/html/draft-
               meunier-webbotauth-httpsig-protocol-01>.
+
+   [I-D.meunier-webbotauth-registry]
+              Guerreiro, M., Kirazci, U., and T. Meunier, "Registry and
+              Signature Agent card for Web bot auth", Work in Progress,
+              Internet-Draft, draft-meunier-webbotauth-registry-03, 26
+              June 2026, <https://datatracker.ietf.org/doc/html/draft-
+              meunier-webbotauth-registry-03>.
 
    [I-D.schlesinger-cfrg-act]
               Schlesinger, S. and J. Katz, "Anonymous Credit Tokens",
