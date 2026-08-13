@@ -1021,7 +1021,7 @@ Profiles that rely on unrecoverable client-local state MUST declare that propert
 
 A profile that does not produce a `continuity_handle` for a valid presentation is not conformant with this specification. A successful verification result for a conforming profile MUST include a verifier-local `continuity_handle`.
 
-While a verified human remains eligible and retains the state required by a profile, the profile MUST support repeated valid presentations by that human within the same continuity scope, including presentations bound to different valid challenge nonces. A successful presentation MUST NOT itself terminate that capability.
+A profile MUST support repeated valid presentations by the same verified human within the same continuity scope, including presentations bound to different valid challenge nonces. A successful presentation MUST NOT itself terminate that capability.
 
 The `continuity_handle` MUST be opaque and canonically encoded. Under the profile's documented assumptions, prediction, preimage, and second-preimage resistance MUST be at least 112 bits and SHOULD be at least 128 bits. Enumeration and malleation MUST be infeasible, and accidental collisions MUST be negligible at the profile's maximum supported population.
 
