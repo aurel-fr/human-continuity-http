@@ -1,0 +1,3621 @@
+
+
+
+
+Network Working Group                                          A. Brezun
+Internet-Draft                                        Tools for Humanity
+Intended status: Standards Track                          13 August 2026
+Expires: 14 February 2027
+
+
+                       Human Continuity for HTTP
+               draft-brezun-human-continuity-http-latest
+
+Abstract
+
+   This document defines an HTTP extension for origins that need to
+   attribute repeated participation to the same verified unique human
+   within a declared continuity scope, without requiring a global human
+   identifier or replacing existing authentication.  Within a continuity
+   scope, valid presentations backed by the same human yield the same
+   verifier-local handle, regardless of account, device, or agent, and
+   cannot yield a second handle for that human.  This differs from
+   authentication, which identifies a credential a human may hold many
+   of.  An origin server can publish policy for client-presented unique-
+   human artifacts, issue an explicit challenge, and receive a client-
+   presented artifact on a subsequent request.
+
+   The framework is independent of any realm operator, credential
+   technology, proof system, or definition of humanness.  Companion
+   profiles define artifact syntax, issuance, verification, challenge
+   binding, replay behavior, holder binding, privacy properties, realm
+   metadata, and verifier output.  A conforming profile produces a
+   verifier-local continuity_handle scoped to a realm, attestation
+   audience, and purpose.  This version defines no initial profile.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://aurel-
+   fr.github.io/human-continuity-http/draft-brezun-human-continuity-
+   http.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-brezun-human-continuity-http/.
+
+   Discussion of this document takes place on the HTTP Working Group
+   mailing list (mailto:ietf-http-wg@w3.org), which is archived at
+   https://lists.w3.org/Archives/Public/ietf-http-wg/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/aurel-fr/human-continuity-http.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 14 February 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Relationship to Existing Work
+       1.1.1.  Relationship to Privacy Pass and ACT
+       1.1.2.  Relationship to OAuth Protected Resource Metadata
+       1.1.3.  Relationship to HTTP Authentication Schemes
+       1.1.4.  Relationship to Credential Presentation Protocols
+       1.1.5.  Relationship to Web Bot Auth
+     1.2.  Applicability and Alternatives
+   2.  Conventions and Terminology
+   3.  Design Goals
+   4.  Non-Goals
+   5.  Protocol Overview
+   6.  Attestation Audience and Purpose
+     6.1.  Canonical HTTPS Origin
+     6.2.  Policy Selection
+     6.3.  Cross-Origin Delegation and Audience Granularity
+     6.4.  Effective Values and Continuity Scope
+   7.  HTTP Fields
+     7.1.  Common Field Syntax
+     7.2.  The Human-Continuity-Challenge Field
+     7.3.  The Human-Continuity Field
+     7.4.  Common Field Parameters
+     7.5.  Presentation Assurance
+   8.  Policy Metadata
+     8.1.  Origin-Level Metadata
+     8.2.  Selectors and Policy Entries
+     8.3.  Metadata Members
+     8.4.  Authorization by Policy Metadata
+     8.5.  Metadata Precedence and Trust
+   9.  Realm Metadata
+   10. Unique-Human Profiles
+     10.1.  Profile Identifiers
+     10.2.  Specification Requirements
+     10.3.  Human-Continuity Handle Requirements
+     10.4.  Privacy Properties
+   11. Holder-Bound Presentations
+     11.1.  Binding the Artifact to the HTTP Message Signature Key
+     11.2.  HTTP Message Signature Requirements
+     11.3.  Freshness and Replay Model
+       11.3.1.  Profile Contract
+       11.3.2.  Challenge Context and Acceptance
+       11.3.3.  Replay Keys and Final Acceptance
+       11.3.4.  Security Boundary
+     11.4.  Request Content Binding
+   12. Client Behavior
+   13. Verifier Behavior
+   14. Caching and Intermediaries
+   15. Browser and CORS Considerations
+   16. Status Codes and Error Responses
+   17. Header Size and Artifact Size
+   18. Privacy Considerations
+     18.1.  Privacy Threats
+     18.2.  Exclusion, Accessibility, and Coercion
+   19. Implementation Status
+   20. Security Considerations
+   21. IANA Considerations
+     21.1.  HTTP Field Name Registrations
+     21.2.  Well-Known URI Registrations
+     21.3.  Human-Continuity Presentation Assurance Value Registry
+   22. Examples
+     22.1.  Challenge Reuse for a Request-Scoped Policy
+     22.2.  Holder-Bound Presentation
+     22.3.  Policy Metadata
+     22.4.  Realm Metadata
+     22.5.  Realm Metadata Without JWKs
+     22.6.  Using Verifier Output in Origin Policy
+   23. References
+     23.1.  Normative References
+     23.2.  Informative References
+   Appendix A.  Open Issues
+   Acknowledgements
+   Author's Address
+
+1.  Introduction
+
+   HTTP APIs may benefit from supplemental request signals that are not
+   equivalent to authenticating a user account.  One such signal is that
+   a request is backed by a verified unique human within a continuity
+   scope selected by the verifier.  Origins may use such a signal as an
+   input to origin policy decisions, including duplicate account
+   prevention, free-tier signup, per-human quotas, API quota grouping,
+   Sybil-resistant participation, grant claims, trial credit claims,
+   agent delegation, request prioritization, or measurement.
+
+   Authentication and human continuity answer different questions.
+   Origin authentication identifies an account, session, API key, mTLS
+   identity, or other application principal.  A single human can often
+   create or control multiple authenticated accounts, devices, sessions,
+   or agents, and a single authenticated account can sometimes be
+   accessed by multiple humans or automated systems.
+
+   Human continuity is a supplemental signal.  It allows an origin to
+   learn that two presentations, accounts, devices, sessions, or agents
+   are backed by the same verified unique human within a declared
+   continuity scope, without learning that human's global identity and
+   without enabling cross-verifier correlation.
+
+   Two properties set this mechanism apart.  Against authentication, the
+   continuity_handle is keyed to a verified unique human, not to a
+   credential the subject controls, so within a scope a human has one
+   handle and cannot present as two.  Against unlinkable mechanisms such
+   as Privacy Pass [RFC9576], it is controlled linkability: the verifier
+   intentionally receives a stable verifier-local value within a scope
+   rather than an unlinkable fact (Section 1.2).
+
+   A profile that does not produce a verifier-local continuity_handle is
+   not a conforming profile under this specification.
+
+   Existing human-continuity integrations are generally origin-specific.
+   Each origin defines its own discovery mechanism, challenge format,
+   token format, and verification behavior.  This creates fragmented
+   client support and makes it difficult for browsers, mobile apps,
+   agents, SDKs, API gateways, and other HTTP clients to interoperate.
+
+   This document defines a small HTTP protocol for unique-human
+   artifacts:
+
+   *  policy metadata can declare the accepted human-continuity purposes
+      and unique-human profiles for request contexts;
+
+   *  an origin can issue an explicit challenge using Human-Continuity-
+      Challenge;
+
+   *  a client can present a unique-human artifact using Human-
+      Continuity;
+
+   *  a holder-bound profile can bind the artifact to a concrete HTTP
+      request using HTTP Message Signatures [RFC9421]; and
+
+   *  origins and clients can discover policy metadata and realm
+      metadata using well-known locations [RFC8615].
+
+   The protocol intentionally does not define a single global proof of
+   human, identity system, realm governance model, or cryptographic
+   proof format.  Those details belong to unique-human profiles.  The
+   core protocol requires that a conforming profile provide scoped human
+   continuity and defines how origins and clients discover, request, and
+   transport those artifacts over HTTP.
+
+   This document does not privilege any realm operator, issuance
+   ceremony, biometric system, credential format, or verification
+   technology.  Unique-human mechanisms specific to a realm are
+   specified as separate unique-human profiles conforming to the
+   requirements in Section 10.
+
+   This document is therefore a discovery, challenge, and transport
+   substrate, not a complete unique-human system by itself.
+
+1.1.  Relationship to Existing Work
+
+1.1.1.  Relationship to Privacy Pass and ACT
+
+   Privacy Pass [RFC9576] provides privacy-preserving token issuance and
+   redemption for cases where the origin should learn an unlinkable fact
+   rather than a stable continuity value.  Anonymous Credit Tokens (ACT)
+   [I-D.schlesinger-cfrg-act] support unlinkable credit issuance and
+   spending.  These mechanisms are complementary to this specification:
+   Section 1.2 defines the boundary between them and scoped human
+   continuity.
+
+1.1.2.  Relationship to OAuth Protected Resource Metadata
+
+   This specification also defines metadata for origin policy discovery,
+   but it deliberately uses a different topology from OAuth 2.0
+   Protected Resource Metadata [RFC9728].  Human-continuity policy can
+   apply across many API paths and methods at one origin, so this
+   document uses a single origin-level policy metadata document with
+   policy selectors that select policies.
+
+1.1.3.  Relationship to HTTP Authentication Schemes
+
+   An origin uses human continuity as an input to its own policy.
+   Native authentication and authorization remain origin-defined.  An
+   authentication scheme identifies a credential the subject can hold
+   many of, whereas a continuity_handle represents the backing human and
+   cannot be forked into a second value within a scope (Section 10.3).
+
+   An HTTP authentication scheme conveys its credential in the
+   Authorization request field [RFC9110], which carries a single
+   credential.  A presentation defined as an authentication scheme
+   therefore could not accompany an origin's native authentication on
+   the same request; the PrivateToken scheme of the Privacy Pass HTTP
+   authentication scheme [RFC9577], which redeems tokens in
+   Authorization, is one such design.  Presentations are commonly sent
+   together with native authentication: the holder-bound example in
+   Section 22.2 carries Human-Continuity alongside Authorization:
+   Bearer.  This specification carries presentations in dedicated fields
+   rather than defining or extending an authentication scheme, and does
+   not use status 401 or 407 (Section 16).
+
+1.1.4.  Relationship to Credential Presentation Protocols
+
+   OpenID for Verifiable Presentations [OpenID4VP] and the W3C Digital
+   Credentials API [DC-API] define how a verifier requests and obtains a
+   credential presentation from a holder's wallet.  This document adds
+   origin-discoverable policy, challenges, and a scope-local
+   continuity_handle that an origin can use to link valid presentations
+   backed by the same verified human; each verified human has at most
+   one handle in the scope (Section 10.3).  BBS pseudonyms
+   [I-D.irtf-cfrg-bbs-per-verifier-linkability] provide a stable per-
+   verifier value from one credential and holder-held secrets, but leave
+   one-per-human uniqueness at issuance, continuity after loss of those
+   secrets, and HTTP policy discovery out of scope.  Section 1.2 defines
+   when a presentation alone suffices.
+
+   These protocols can provide artifact acquisition paths rather than
+   alternatives to this document.  A unique-human profile can, for
+   example, define a credential format carried in an OpenID4VP
+   presentation.  The Digital Credentials API is mediated by the user
+   agent and supports a fixed set of exchange protocols, so a profile
+   using it also needs an invocation path for clients outside a browser.
+
+   Version 0.2.0 of x401 [X401] gates a route on a verifier-composed,
+   nonce-bearing proof request.  The client obtains a credential
+   presentation by executing the embedded Digital Credentials API
+   request in a user agent or relaying it to another credential manager.
+   The verifier can mint a short-lived, verifier-scoped bearer token
+   recording its decision.  That token expires; a continuity_handle
+   instead identifies the same verified human across presentations,
+   clients, and transports.
+
+1.1.5.  Relationship to Web Bot Auth
+
+   Web Bot Auth [I-D.meunier-webbotauth-httpsig-protocol] authenticates
+   the automated agent behind an HTTP request using an HTTP Message
+   Signature [RFC9421] tagged web-bot-auth and uses Signature-Agent for
+   in-band verification-key discovery.  Signature Agent Cards describe
+   the signing agent and can be listed in registries
+   [I-D.meunier-webbotauth-registry].  A web-bot-auth signature and a
+   holder-bound human-continuity signature can coexist on one request as
+   independent HTTP Message Signatures, each with its own tag; a
+   verifier selects the human-continuity signature by its tag
+   (Section 11.2, Section 7.2.7 of [RFC9421]).
+
+1.2.  Applicability and Alternatives
+
+   This specification is intended for origins that require verifier-
+   local human continuity within a declared continuity scope.  A
+   successful presentation intentionally allows the verifier to
+   determine that repeated presentations within the same (realm,
+   attestation audience, purpose) tuple are backed by the same verified
+   unique human, without requiring a global human identifier.
+
+   Origins SHOULD NOT request Human-Continuity when an unlinkable
+   authorization, redemption, or credit-spend mechanism is sufficient.
+
+   The boundary between this specification and unlinkable mechanisms is
+   whether the origin must recognize the same person across separate
+   permitted events.  Unlinkable mechanisms can enforce one-shot rules
+   and fixed or mutable allowances using artifact-bound, credential-
+   bound, or system-held state, such as a registry-side nullifier store,
+   without giving the origin a stable handle across those events.  MoLE
+   [I-D.jms-mole-architecture] tests and updates hidden credential state
+   while keeping presentations unlinkable.  ACT
+   [I-D.schlesinger-cfrg-act] lets a client prove a spend against a
+   hidden token balance and construct an unlinkable replacement token
+   for the remaining balance.  Privacy Pass [RFC9576] instead uses token
+   redemption.  Its HTTP authentication scheme [RFC9577] defines token
+   verification and recommends preventing the same token nonce from
+   being redeemed twice, while permitting replay-tolerant uses.
+
+   Human-Continuity instead provides the origin with a stable, scope-
+   local pseudonym at decision time: the continuity_handle.  The
+   verifier can associate mutable state with that handle and recognize
+   that a presentation is backed by the same verified unique human as an
+   earlier presentation in the same declared continuity scope.  Human-
+   Continuity addresses the case in which the origin must recognize the
+   same person again to apply, review, or revise a rule for that person.
+   Use cases that may require this recognition include duplicate account
+   prevention, per-human quota grouping across accounts or sessions,
+   Sybil-resistant participation, recovery-sensitive account workflows,
+   grant or trial credit claims that require human continuity, and agent
+   delegation policies that group activity by the backing human.
+
+   Unlinkable mechanisms that rely on client-retained tokens,
+   credentials, or balances can suit short-lived or single-device use
+   but be less suitable for long-lived, multi-device, or recoverable
+   continuity.  Support for those properties in this framework depends
+   on the selected profile's state, recovery, and device continuity
+   model (Section 10), increases privacy risk, and requires narrow
+   continuity scopes.
+
+   A credential presentation alone shows that the subject holds a
+   qualifying credential at presentation time.  If that check suffices,
+   a presentation protocol without this document is preferable.
+
+   A client-stored linkable value, such as a long-lived cookie or bearer
+   token, derives its continuity from retaining and replaying one
+   secret.  A client can hold several such values to present as distinct
+   continuities, and losing a value loses that continuity.  A
+   continuity_handle instead derives from verification of a unique human
+   under a realm and is computed verifier-locally.  Within a scope,
+   valid presentations backed by the same verified human produce the
+   same handle, regardless of the clients, accounts, or credentials used
+   (Section 10.3).  After loss of client state, the selected profile
+   defines whether another valid presentation remains possible; if so,
+   it produces the same scoped handle (Section 10).
+
+   For allocation or abuse-control uses, a scoped continuity_handle does
+   not eliminate abuse; it changes the attacker's bottleneck from
+   creating accounts to obtaining access to distinct verified humans.
+
+2.  Conventions and Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   [BCP14] (RFC2119) (RFC8174) when, and only when, they appear in all
+   capitals, as shown here.
+
+   The two HTTP fields defined by this document use Structured Field
+   Values [RFC9651].  This document does not define separate ABNF for
+   their field values.  The field values are parsed according to
+   [RFC9651], and this document adds semantic constraints on the parsed
+   items and parameters.
+
+   HTTP field names are case-insensitive [RFC9110].  Examples in this
+   document use conventional capitalization.  When an HTTP field is
+   covered by an HTTP Message Signature, the component identifier and
+   canonicalization rules are those defined by [RFC9421].
+
+   Long example lines that end with backslash use the single backslash
+   line-wrapping convention from [RFC8792] and are to be unfolded before
+   interpreting the example.
+
+   This specification uses two related terms deliberately, on two axes.
+   A unique-human profile defines how a subject is established to be a
+   verified unique human under a realm, and defines how the
+   continuity_handle is derived.  The Human-Continuity HTTP layer
+   transports presentations that, when valid, yield a verifier-local
+   continuity_handle.  The two axes meet in the continuity scope: the
+   unique-human profile establishes that the subject is a unique human,
+   the continuity scope is where the resulting continuity holds, and the
+   continuity_handle is comparable within it.  The first valid
+   presentation in a scope establishes the scoped comparison value;
+   later valid presentations producing the same value are backed by the
+   same verified unique human.
+
+   Origin: The HTTP origin server that publishes policy for, challenges
+   for, receives, and verifies human-continuity presentations.
+
+   Client: An HTTP client, browser component, mobile app, agent tool,
+   SDK, command-line tool, service, or other requester that can obtain
+   or present a unique-human artifact.
+
+   Realm: A URI [RFC3986] identifying a human-continuity namespace.
+   Within a realm, a conforming profile maps the same verified human to
+   the same continuity_handle for a given attestation audience and
+   purpose; different realms are distinct handle namespaces.  A human-
+   continuity realm is unrelated to the realm authentication parameter
+   of HTTP authentication schemes ([RFC9110]).
+
+   Realm operator: The entity responsible for a realm.  The realm
+   operator publishes the realm's metadata and the verification
+   material, if any, that a verifier uses to validate artifacts, and
+   establishes the conditions under which artifacts are produced.  For
+   example, it can sign a context that is bound to the attestation
+   audience and purpose and used for a proof request.  In profiles where
+   the realm operator generates the artifact directly, it can instead
+   sign the artifact itself.  A realm operator is not required to
+   custody the subject's identity secret; in profiles that separate
+   these roles, a user-controlled component defined by the profile holds
+   the secret and produces the artifact locally.
+
+   Unique-human artifact: A cryptographic object presented by the client
+   and verified by the origin according to a unique-human profile.  A
+   valid artifact proves that the subject is a verified unique human and
+   produces a continuity_handle for the selected continuity scope.  This
+   document does not define the cryptographic format of the artifact.
+
+   Unique-human profile: A named specification that defines artifact
+   syntax, issuance, verification, realm metadata, privacy properties,
+   holder binding, challenge nonce binding, replay behavior, revocation
+   behavior, continuity_handle derivation, and verifier output.  This
+   document also uses "profile" for this term.
+
+   Profile identifier: A case-sensitive ASCII string that identifies a
+   unique-human profile.  It is carried as the positional String value
+   of a Human-Continuity-Challenge list member, or as the Human-
+   Continuity item value.  Its syntax and naming rules are defined in
+   Section 10.1.
+
+   Attestation audience: The origin to which a unique-human artifact is
+   bound and within which the resulting continuity_handle is
+   interpreted.  In this version, unless a future cross-origin
+   delegation extension allows otherwise, the attestation audience is
+   the canonical HTTPS origin of the request.
+
+   Purpose: A string defined by origin policy that identifies the
+   context in which human continuity is requested or accepted.  This
+   document uses "concrete purpose" when contrasting a purpose with the
+   purpose templates in policy metadata (Section 8.3).
+
+   Purpose template: The name of a purpose entry that authorizes a
+   family of concrete purposes by prefix, defined in Section 8.3.  A
+   purpose template is not part of the continuity scope; the concrete
+   purpose carried in Human-Continuity-Challenge or Human-Continuity is.
+
+   Continuity scope: The tuple under which the same verified human is
+   expected to produce the same continuity_handle.  The continuity scope
+   is the tuple (realm, attestation audience, purpose).
+
+   continuity_handle: The profile-defined continuity value included in
+   verifier output.  Within a continuity scope, repeated valid
+   presentations by the same verified human produce the same
+   continuity_handle.
+
+   Policy identifier: An origin-local token that names a policy
+   definition in policy metadata.  A policy identifier is selected for a
+   request path and method.
+
+   Policy selector: A policy metadata mapping that maps request path
+   patterns for one HTTP method to policy identifiers.
+
+   Challenge nonce: A verifier-generated value carried in the challenge
+   parameter of Human-Continuity-Challenge (Section 7.4) and bound by
+   the selected profile according to Section 11.3.  A challenge nonce is
+   distinct from the nonce signature parameter defined by [RFC9421].
+
+   Challenge context: The profile, effective realm, effective
+   attestation audience, purpose, and requested presentation-assurance
+   value, if any, for which a challenge nonce was issued (Section 11.3).
+
+   Subject: The verified human that an artifact attests as unique; the
+   human claimed to be a unique human.
+
+   Holder: The party that controls the use of an artifact in
+   presentations.  The holder can be the subject, or a client or agent
+   acting for a human.
+
+   Holder key: A client-controlled signing key bound to an artifact by a
+   holder-bound profile.
+
+   Presentation: The act of attaching a unique-human artifact to an HTTP
+   request.
+
+   Holder-bound presentation: A presentation in which the client proves
+   possession of a holder key by attaching an HTTP Message Signature
+   over selected HTTP message components.
+
+   Verifier: The origin-side component that parses and validates a
+   human-continuity presentation and emits verifier output to origin
+   policy.
+
+   Verifier output: A structured local result produced by the verifier.
+   Section 13 defines its states and required contents.
+
+3.  Design Goals
+
+   The protocol has the following design goals:
+
+   *  Scoped human continuity.  The protocol provides verifier-local
+      continuity across repeat presentations by the same verified human,
+      exposed as a continuity_handle that is meaningful only within a
+      declared continuity scope.
+
+   *  Realm and artifact neutrality.  The HTTP exchange is independent
+      of any particular realm operator, credential, zero-knowledge proof
+      system, token format, or vendor.
+
+   *  Voluntary client participation.  Clients can ignore policy
+      metadata and challenges, and origins can define behavior for
+      requests that omit human-continuity presentations.
+
+   *  Verifier-local operation.  The design favors profiles that can be
+      verified locally by the origin, without requiring a call to the
+      realm operator on the request path.
+
+   *  Artifact theft resistance.  The design favors holder binding for
+      reusable artifacts so that artifact disclosure alone is
+      insufficient for presentation.
+
+   *  Deterministic method and policy selection and authorization, with
+      precise audience and purpose binding.  Clients need deterministic
+      selection of the policy identifier, attestation audience, purpose,
+      and continuity scope to avoid origin confusion, method confusion,
+      purpose broadening, and cross-origin realm injection.
+
+   *  Operation through ordinary HTTP infrastructure.  The protocol
+      should work with API gateways, CDNs, reverse proxies, browser
+      CORS, mobile clients, agents, and SDKs, subject to the caching and
+      header size considerations described in this document.
+
+4.  Non-Goals
+
+   This document does not define:
+
+   *  what makes a user human, how humanness is determined, or a single
+      proof-of-human ceremony;
+
+   *  a global human identity system or a global realm governance model;
+
+   *  a cryptographic artifact format or a mandatory profile;
+
+   *  device integrity, workload attestation, or generic remote
+      attestation [RFC9334];
+
+   *  cross-origin policy or attestation audience delegation;
+
+   *  a browser- or operating-system-transparent attachment mechanism;
+
+   *  a guarantee that requests backed by human continuity receive
+      different service treatment.
+
+5.  Protocol Overview
+
+   Client                    Origin             Realm operator
+     |                         |                         |
+     | metadata request        |                         |
+     |------------------------>|                         |
+     | policy metadata         |                         |
+     |<------------------------|                         |
+     | ordinary request        |                         |
+     |------------------------>|                         |
+     | challenge               |                         |
+     |<------------------------|                         |
+     | issuance ceremony       |                         |
+     |-------------------------------------------------->|
+     | unique-human artifact   |                         |
+     |<--------------------------------------------------|
+     | send Human-Continuity   |                         |
+     | optional HTTP signature |                         |
+     |------------------------>|                         |
+     |                         | local verification      |
+     |                         | origin policy           |
+
+   Human-Continuity-Challenge is the only response field defined by this
+   specification that requests a human-continuity presentation.
+
+   An origin MAY send Human-Continuity-Challenge on any response to ask
+   the client to obtain or present an artifact.  A challenge carries a
+   challenge nonce and has specific cache and replay semantics.
+
+   A client that chooses to present an artifact sends Human-Continuity
+   on a subsequent request.  If the selected profile is holder-bound,
+   the client also sends an HTTP Message Signature using Signature-Input
+   and Signature as defined by [RFC9421].
+
+   This protocol does not define OPTIONS as a general negotiation step.
+   For a protected GET request, the origin can send Human-Continuity-
+   Challenge on the GET response, and the client can retry the same GET
+   with Human-Continuity.  Cross-origin browser requests can involve
+   CORS preflight for the actual request fields and methods, but that
+   preflight is not a human-continuity challenge exchange.
+
+   In typical exchanges, the client validates metadata and any challenge
+   against policy metadata and realm metadata before issuance or
+   presentation.  The diagram shows policy metadata as a separate fetch
+   that can happen before, during, or after the request being evaluated,
+   depending on cache state.  It omits realm metadata fetches for
+   readability.
+
+   The origin verifies the presentation according to the selected
+   profile.  A successful verification result for a conforming profile
+   includes a verifier-local continuity_handle scoped by realm,
+   attestation audience, and purpose.  This document does not define the
+   origin's final policy decision.
+
+6.  Attestation Audience and Purpose
+
+   A unique-human artifact is meaningful only for the attestation
+   audience and purpose for which it was issued or derived.  Clients and
+   origins therefore need deterministic policy identifier, attestation
+   audience, purpose, and continuity scope rules.
+
+6.1.  Canonical HTTPS Origin
+
+   The attestation audience for a request is the canonical HTTPS origin
+   of that request.
+
+   To determine the canonical HTTPS origin, determine the target URI's
+   origin as defined by [RFC9110], Section 4.3.1, requiring the scheme
+   to be "https", and serialize that origin using the ASCII
+   serialization of an origin defined by [RFC6454], Section 6.2.
+   Clients and verifiers MUST compare canonical HTTPS origins by exact
+   string equality after this serialization.
+
+   Therefore, the following inputs have the same canonical HTTPS origin:
+
+   https://api.example.com
+   https://api.example.com/
+   https://api.example.com:443/
+
+   and the canonical HTTPS origin is:
+
+   https://api.example.com
+
+   Profiles MAY reject IP-literal attestation audiences.
+
+6.2.  Policy Selection
+
+   The effective policy identifier for a request is derived from the
+   request method, request URI, and valid policy metadata.
+
+   Policy identifiers are origin-local names, such as quota, recovery,
+   or graphql.  An origin can make a policy the default for requests not
+   matched by a policy selector for the request method by publishing a
+   default policy selector that maps the request method to that policy
+   identifier.
+
+   Configured policy metadata is configured metadata (Section 8.5)
+   provisioned for the request's canonical HTTPS origin.
+
+   To determine the effective policy identifier for a request:
+
+   1.  Compute the canonical HTTPS origin of the request according to
+       Section 6.1.
+
+   2.  Fetch policy metadata for that canonical HTTPS origin from the
+       URL formed by appending /.well-known/human-continuity to the
+       canonical HTTPS origin, use valid cached policy metadata from
+       that location, or use valid configured policy metadata for that
+       canonical HTTPS origin:
+
+      https://service.example/.well-known/human-continuity
+
+       The metadata document's origin member MUST exactly equal the
+       canonical HTTPS origin of the request.
+
+       If no valid configured policy metadata is used, absence of
+       fetched policy metadata is established only when the response of
+       the origin-level policy metadata fetch has status code 404 or
+       410.  In that case, the origin has no metadata-derived human-
+       continuity policy.  A client MUST NOT obtain or present, and a
+       verifier MUST NOT accept, a unique-human artifact for that
+       request under this protocol.
+
+   3.  Let request-method be the HTTP method of the request.
+
+       A method selector matches only by exact HTTP method token
+       equality.  Method tokens are case-sensitive.  The special
+       relationship between GET and HEAD, if any, is not inferred by
+       this protocol; origins that want the same policy for GET and HEAD
+       MUST list both methods.
+
+   4.  Let request-path be the path component of the request URI,
+       excluding any query component.  If the request URI has an empty
+       path, request-path is "/".
+
+   5.  A request path containing dot-segments, as defined by [RFC3986],
+       Section 3.3, MUST NOT match any policy selector or default policy
+       selector under this protocol.  No policy identifier is selected
+       for inline human-continuity fields or presentations, and the
+       selection algorithm stops.  Clients and verifiers MUST NOT accept
+       Human-Continuity-Challenge or Human-Continuity for such a request
+       unless a future extension defines safe normalization semantics.
+
+   6.  Look up request-method in policy_selectors.  If policy_selectors
+       contains a member name equal to request-method, the method's
+       policy selector map is the value of that member.  Otherwise,
+       request-method has no policy_selectors entry.
+
+       If request-method has a policy_selectors entry and the method's
+       policy selector map contains a non-wildcard member name that is
+       exactly equal to request-path, the effective policy identifier is
+       that member's value and the selection algorithm stops.
+
+       Otherwise, if request-method has a policy_selectors entry, build
+       the set of matching subtree pattern candidates from the method's
+       policy selector map.  If request-method has no policy_selectors
+       entry, no subtree pattern candidate exists from policy_selectors
+       for that method.  Each candidate is a tuple of (matched
+       path_pattern, policy identifier, specificity).
+
+       For a subtree pattern ending in "/**", let base be the pattern
+       with the final "**" removed.  The base MUST NOT be "/".  The
+       pattern matches request-path if request-path begins with base.
+
+       An origin that wants both a base path and its descendants to
+       select the same policy identifier lists both patterns, such as
+       "/account" and "/account/**".
+
+       For example, "/account/**" matches "/account/" and "/account/
+       settings", but does not match "/account" or "/accounting".
+
+   7.  If one or more subtree pattern candidates exist, the effective
+       policy identifier is the policy identifier selected by the
+       candidate with the highest path specificity, and the selection
+       algorithm stops.  For a subtree pattern, specificity is the
+       length of the prefix before "/**".
+
+   8.  If no subtree pattern candidate exists, look up request-method in
+       default_policy_selectors.  If default_policy_selectors contains a
+       member name equal to request-method and request-path does not
+       begin with "/.well-known/", the effective policy identifier is
+       that member's value.
+
+       Otherwise, no policy identifier is selected for inline human-
+       continuity fields or presentations.  The client and verifier MUST
+       NOT accept Human-Continuity-Challenge or Human-Continuity based
+       on policy metadata for that request.  The "/.well-known/"
+       exclusion mirrors the prohibition on "/.well-known/" path
+       patterns in policy selectors.
+
+   Policy selector matching is method-first.  A policy selector listed
+   under one method does not shadow a less-specific policy selector or
+   default policy selector for another method.  For example, if metadata
+   contains a GET selector for "/account/**" and a POST selector for
+   "/account/recovery/**", then GET /account/recovery/123 selects the
+   less-specific GET selector for "/account/**".
+
+   Policy selection is performed before evaluating profile, effective
+   realm, effective attestation audience, purpose, or presentation-
+   assurance constraints.  After a policy identifier has been selected
+   for the request method by a policy selector or default policy
+   selector, a client or verifier MUST NOT fall back to a less-specific
+   or default policy identifier merely because the selected policy does
+   not authorize the inline values.
+
+6.3.  Cross-Origin Delegation and Audience Granularity
+
+   Cross-origin delegated attestation audiences are out of scope for
+   this document.
+
+   An origin MUST NOT cause a client to obtain or present an artifact
+   for a different origin's attestation audience.  Cross-origin
+   delegation requires a future extension that defines delegation
+   metadata, authority checks, downgrade protections, and realm trust
+   rules.
+
+   Attestation audiences narrower than the canonical HTTPS origin, such
+   as path-scoped same-origin resource identifiers, are likewise not
+   defined by this version.  A future extension can introduce narrower
+   audiences as an optional policy metadata member without changing the
+   HTTP fields defined by this document.
+
+6.4.  Effective Values and Continuity Scope
+
+   For each challenge or presentation, the client and verifier determine
+   the following values:
+
+   For Human-Continuity-Challenge, the request used for policy selection
+   is the request that generated the response containing the field.  For
+   Human-Continuity, the request used for policy selection is the
+   request carrying the field.
+
+   request method: For Human-Continuity-Challenge, the request method is
+   the method of the request that generated the response containing the
+   field.  For Human-Continuity, the request method is the method of the
+   request carrying the field.
+
+   effective policy identifier: The policy identifier selected for the
+   request by Section 6.2.
+
+   effective realm: The realm selected for the request by the selected
+   purpose entry in policy metadata.
+
+   effective attestation audience: The canonical HTTPS origin of the
+   request (Section 6.1).
+
+   purpose: The concrete purpose carried in the purpose field parameter
+   (Section 7.4) and authorized by policy metadata.
+
+   selected purpose entry: The purpose entry (Section 8.3) selected for
+   the concrete purpose under the effective policy identifier.
+
+   selected presentation-assurance value: The presentation-assurance
+   value requested by Human-Continuity-Challenge or asserted by Human-
+   Continuity, if present.  If the field has no presentation-assurance
+   parameter, no presentation-assurance value is selected.
+
+   continuity scope: The tuple (effective realm, effective attestation
+   audience, purpose) used to derive and interpret the
+   continuity_handle.
+
+   The prefix "effective" marks a value determined per request by this
+   section.  The purpose carries no prefix because it is carried
+   verbatim in the purpose field parameter and validated against policy
+   metadata rather than derived.
+
+   Separating request method and policy identifier from realm,
+   attestation audience, and purpose allows different HTTP request
+   contexts to publish different profile choices or presentation-
+   assurance requirements while sharing one continuity scope when policy
+   selects the same effective realm and the fields select the same
+   purpose.  It also allows single-endpoint APIs, such as GraphQL or RPC
+   over POST, to select one HTTP policy identifier while different
+   application operations select different purposes, realms, profiles,
+   or assurance requirements.
+
+   The purpose value has no default.  Each Human-Continuity-Challenge
+   list member and Human-Continuity item MUST include a concrete
+   purpose.  The purpose value MUST be authorized by the selected policy
+   through a purpose entry for the selected profile.  Purpose
+   authorization is privacy-sensitive because it defines the verifier's
+   linkability sets.  The purposes and purpose templates listed in
+   metadata make those linkability sets visible, making policy easier to
+   audit, while avoiding an unbounded namespace of arbitrary challenge-
+   selected purposes.
+
+   The values are determined as follows:
+
+   1.  Determine the request method and effective policy identifier from
+       the request according to Section 6.2.
+
+   2.  Select the purpose entry from the selected policy definition's
+       purposes map.
+
+       If the selected policy definition's purposes map contains an
+       entry name exactly equal to the concrete purpose, that purpose
+       entry is selected.  A purpose template is never exactly equal to
+       a concrete purpose, because concrete purpose values cannot
+       contain { or }. Within the selected policy definition, an exactly
+       matching entry name takes precedence over any purpose template
+       that would also match the concrete purpose.  Such a purpose
+       template is not considered to authorize that concrete purpose for
+       that selected policy.
+
+       Otherwise, if exactly one purpose template in the selected policy
+       definition's purposes map matches the concrete purpose, that
+       purpose entry is selected.  If no purpose template matches, the
+       concrete purpose is not authorized.  If a purpose entry is
+       selected but its profiles object does not authorize the selected
+       profile or the selected presentation-assurance value, or its
+       realm does not match the value required for the artifact or
+       presentation, the client and verifier MUST NOT fall back to
+       another purpose entry.
+
+   3.  Determine the effective realm from the realm of the selected
+       purpose entry.
+
+   4.  The effective attestation audience is the canonical HTTPS origin
+       of the request (Section 6.1).
+
+   5.  The continuity scope is (effective realm, effective attestation
+       audience, purpose).  Profiles MAY use profile-specific
+       cryptographic inputs when validating or generating artifacts, but
+       those inputs MUST NOT change the verifier-visible continuity
+       scope or the continuity_handle produced for the same effective
+       realm, effective attestation audience, purpose, and verified
+       human.
+
+   Changing the effective realm changes the continuity scope.  A
+   conforming profile produces continuity_handle values for the new
+   scope that are not correlatable with values from the previous scope.
+   Continuity across a change of realm operator therefore requires
+   keeping the realm stable so that the continuity scope does not
+   change; key and infrastructure changes under a stable realm follow
+   the profile's defined behavior for rotating realm operator trust
+   material.
+
+   Origins SHOULD choose purpose values that are stable for the
+   continuity set in which repeated participation by the same human is
+   intended to be detected.  The origin is responsible for ensuring that
+   emitted purpose values correspond to the intended continuity set: a
+   purpose value that is too broad increases linkability, and a purpose
+   value that is too narrow can prevent human continuity.  Origins
+   SHOULD NOT include per-request randomness, challenge nonces, session
+   identifiers, one-time transaction identifiers, or other values that
+   make each presentation use a unique purpose, unless the origin
+   intentionally does not need human continuity across those
+   presentations.  When per-request unlinkability is desired, Human-
+   Continuity is the wrong mechanism; origins need an unlinkable
+   redemption mechanism instead (Section 1.2).
+
+   Origins MAY use bounded scopes, such as time-windowed or event-
+   specific purpose values, when the origin requires human continuity
+   only within that bounded context.  For example,
+   "api_quota:2026-06-04", "promo:summer-sale", or "trial_credit_claim"
+   can define narrower continuity contexts than a broad account- or
+   origin-wide purpose.  Each such purpose value MUST be authorized in
+   policy metadata, as a listed purpose or through a purpose template.
+   Origins using bounded purpose values SHOULD document the continuity
+   boundary, including how purpose values are formed and how long each
+   scope is intended to last.
+
+   Before obtaining or presenting an artifact, a client MUST verify that
+   the challenge or presentation is authorized by policy metadata
+   (Section 8.4).
+
+   Unless a future cross-origin delegation extension allows otherwise:
+
+   *  the effective policy identifier MUST match a policy definition
+      selected for the request by policy metadata; and
+
+   *  the effective attestation audience MUST be the canonical HTTPS
+      origin of the request.
+
+   Clients MUST ignore any challenge whose purpose value is absent or
+   syntactically invalid or that is not authorized by policy metadata
+   (Section 8.4).
+
+   Verifiers MUST NOT treat presentations as valid unless the
+   presentation is authorized by policy metadata (Section 8.4), the
+   purpose value is present and syntactically valid, the purpose value
+   is accepted by origin policy for the request, and the artifact is
+   bound to that purpose according to the selected profile.
+
+   Examples:
+
+   The examples below show the exchange first, then the policy metadata
+   checked to derive the effective values.  The abbreviated metadata is
+   complete for the shown request method and path, with unrelated non-
+   matching entries omitted.  Example artifact and Signature values are
+   illustrative placeholders, and the profile identifier
+   "com.example.unique-human.v1" used throughout names a fictional
+   profile.  A real artifact is bound to one effective realm, effective
+   attestation audience, and purpose, and the same artifact bytes would
+   not be valid across the different continuity scopes shown in this
+   document's examples.  Additional end-to-end flows against a
+   consolidated policy metadata document are shown in Section 22.
+
+   Example 1: default policy selector with origin-scoped policy
+
+   For a GET request to:
+
+   https://service.example/accounts/free-tier
+
+   HTTP field in the response:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="site_rate_limit"; \
+     challenge=:rcccO4BcyTMPkx0CQ9PAXk3YyoM5fw5+ycNeGGVZTlk=:
+
+   Relevant policy metadata:
+
+   {
+     "origin": "https://service.example",
+     "default_policy_selectors": {
+       "GET": "site",
+       "HEAD": "site"
+     },
+     "policy_selectors": {},
+     "policies": {
+       "site": {
+         "purposes": {
+           "site_rate_limit": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {}
+             }
+           }
+         }
+       }
+     }
+   }
+
+   Effective values and continuity scope:
+
+   effective policy identifier:    site
+   effective realm:                https://realm.example
+   effective attestation audience: https://service.example
+   purpose:                        site_rate_limit
+   continuity scope:
+     (https://realm.example, https://service.example, site_rate_limit)
+
+   No policy selector is found for GET /accounts/free-tier, so the GET
+   default policy selector selects the site policy.  The effective
+   attestation audience is the canonical HTTPS origin of the request.
+
+   Example 2: purpose template for a single-endpoint API
+
+   For a POST request to:
+
+   https://api.example.com/graphql
+
+   HTTP field in the response:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="promo:summer-sale"; \
+     challenge=:oxbD0b5k8UfuppijrLSxroRhXys8WmzucB95TXadeHs=:; \
+     presentation-assurance="subject-present"
+
+   Relevant policy metadata:
+
+   {
+     "origin": "https://api.example.com",
+     "default_policy_selectors": {},
+     "policy_selectors": {
+       "POST": {
+         "/graphql": "graphql"
+       }
+     },
+     "policies": {
+       "graphql": {
+         "purposes": {
+           "promo:loyalty": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {
+                 "presentation_assurances": ["human-verified"]
+               }
+             }
+           },
+           "promo:{campaign}": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {
+                 "presentation_assurances": ["subject-present"]
+               }
+             }
+           }
+         }
+       }
+     }
+   }
+
+   The POST /graphql request selects the GraphQL policy.  The concrete
+   purpose "promo:summer-sale" does not equal any purpose listed under
+   the policy, so the "promo:{campaign}" purpose template authorizes it
+   and selects the realm, profile entry, and presentation-assurance
+   value.  For the concrete purpose "promo:loyalty", the exactly
+   matching purpose takes precedence even though the purpose template
+   also matches it: its purpose entry applies, including its "human-
+   verified" presentation-assurance value, with no fallback to the
+   purpose template's purpose entry.  The concrete purpose, not the
+   purpose template, is part of the continuity scope.  A purpose
+   template authorizes concrete purpose values; the concrete purpose
+   itself is always carried in the challenge.
+
+   Selected presentation-assurance value and continuity scope:
+
+   selected presentation-assurance value: subject-present
+   continuity scope:
+     (https://realm.example, https://api.example.com, promo:summer-sale)
+
+   When the client retries an operation-specific request with content,
+   it includes request content coverage in the HTTP Message Signature:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   POST /graphql HTTP/1.1
+   Host: api.example.com
+   Content-Type: application/json
+   Content-Digest: sha-256=:J7PDCuRys5571B0uq8VctIJxawOGKDI\
+     DolzxGhJyAWA=:
+   Human-Continuity: "com.example.unique-human.v1"; \
+     artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
+     purpose="promo:summer-sale"; \
+     presentation-assurance="subject-present"
+   Signature-Input: hu=("@method" "@target-uri" \
+     "human-continuity";sf "content-digest");created=1778480000;\
+     expires=1778480060;\
+     keyid="urn:ietf:params:oauth:jwk-thumbprint:sha-256:1IG2tMH7J2wbJZ\
+     nOf8LJzQitKf7LMvoAElsuDMVM54Y";alg="ed25519";tag="human-continuity"
+   Signature: hu=:bidcWjspV0fNiGmSb4/Gz1YNNOovQ6x1vykhJqOlMOGEpMw89IZz\
+     jfjoqa7ZnhGzRGFph9xJhfy6G2aOlZkdDA==:
+
+   {
+     "operationName": "Claim",
+     "variables": {"c": "summer-sale"},
+     "query": "mutation Claim($c: ID!) { claim(campaign: $c) { ok } }"
+   }
+
+7.  HTTP Fields
+
+7.1.  Common Field Syntax
+
+   Human-Continuity-Challenge is a Structured Field List as defined by
+   [RFC9651].
+
+   Human-Continuity is a Structured Field Item as defined by [RFC9651].
+
+   These fields are specific to human-continuity presentations.  A
+   conforming presentation produces a verifier-local continuity_handle
+   scoped by realm, attestation audience, and purpose.
+
+   Each Human-Continuity-Challenge list member value and the Human-
+   Continuity item value MUST be an sf-string.  The string is the
+   profile identifier.
+
+   Example:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="free_tier_signup"; \
+     challenge=:MB0QuNph5ynfuWXZOJTIzTUIHQ9+puFvDSseCAUBY0s=:
+
+   A client that cannot parse a Human-Continuity-Challenge field value
+   as a Structured Field List MUST ignore that field value.  A client
+   MUST ignore a Human-Continuity-Challenge list member whose member
+   value is not an sf-string.  A client that does not support the
+   indicated profile MUST ignore the Human-Continuity-Challenge list
+   member.
+
+   A verifier MUST treat Human-Continuity as invalid if the field cannot
+   be parsed as a Structured Field Item or its item value is not an sf-
+   string.  If the indicated profile is unsupported, Human-Continuity is
+   unverifiable.
+
+   Parameters defined by this document are listed in Section 7.4.  A
+   client or verifier MUST ignore a parameter defined by this document
+   on a field for which it is not defined.  Other parameters are
+   profile-specific.  A client or verifier MUST ignore a profile-
+   specific parameter unless it supports the selected profile and that
+   profile defines the parameter.  If the profile requires processing of
+   a defined parameter and the client or verifier cannot process it, it
+   MUST reject the affected challenge or presentation.
+
+7.2.  The Human-Continuity-Challenge Field
+
+   The Human-Continuity-Challenge response field explicitly requests a
+   human-continuity presentation.
+
+   Field value type: Structured Field List
+
+   Member value: sf-string profile identifier
+
+   Human-Continuity-Challenge carries a challenge nonce intended for
+   subsequent presentations.  A challenge nonce is valid for a verifier-
+   defined interval (Section 11.3).  Under window acceptance, the
+   challenge layer allows multiple presentations bound to the nonce on
+   requests matching the challenge context, but artifact and
+   presentation reuse remain subject to the selected profile's replay
+   model.  Under single-use acceptance, the verifier accepts at most one
+   presentation for the nonce in that challenge context.  A challenge
+   does not change what policy metadata authorizes (Section 8.5).
+
+   This specification does not define a client-visible challenge
+   lifetime.  A client that presents an artifact bound to an expired or
+   otherwise stale challenge nonce can receive a new Human-Continuity-
+   Challenge and retry according to origin policy.
+
+   A challenge MAY appear on any response status code.  However, origins
+   MUST NOT use 401 solely to request human continuity, and proxies MUST
+   NOT use 407 for this mechanism, as described in Section 16.  The
+   protocol does not depend on a particular error status.
+
+   An origin requiring a presentation to complete a non-idempotent
+   operation MUST issue the challenge before applying any effects of
+   that operation.
+
+   The members of a Human-Continuity-Challenge list are alternatives;
+   their order is not significant.  A client that responds to the
+   challenge selects one member that it supports and that policy
+   metadata authorizes, and sends the presentation for that member.  A
+   verifier that issues a distinct challenge nonce for each member keeps
+   the alternatives independent under the challenge nonce scoping rules
+   of Section 11.3.
+
+   A Human-Continuity-Challenge list member MUST include the purpose
+   parameter.  The purpose value MUST be authorized by a purpose entry
+   under the selected policy for the selected profile and request
+   method.  A client MUST ignore a challenge that is not authorized by
+   policy metadata (Section 8.4).
+
+   An origin MAY challenge for any purpose and profile authorized by
+   policy metadata.
+
+   A Human-Continuity-Challenge list member MUST include the challenge
+   parameter.  A client MUST ignore a Human-Continuity-Challenge list
+   member whose challenge parameter is absent, cannot be parsed as a
+   Byte Sequence, or is not exactly 32 octets (Section 7.4).  The
+   subsequent presentation MUST bind the challenge nonce as defined in
+   Section 11.3.  This binding lets a verifier confirm that the profile-
+   defined issuance or presentation process used the nonce as a
+   freshness input and, when replay protection applies, as a replay key
+   input.
+
+   Example:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   HTTP/1.1 409 Conflict
+   Content-Type: application/problem+json
+   Cache-Control: no-store
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="free_tier_signup"; \
+     challenge=:GqkwBKxFEl3zqUyLTmCNstth8qRN4KANvfufDSJ97fc=:; \
+     presentation-assurance="subject-present"
+
+7.3.  The Human-Continuity Field
+
+   The Human-Continuity request field carries one human-continuity
+   presentation.
+
+   Field value type: Structured Field Item
+
+   Item value: sf-string profile identifier
+
+   The item value identifies the selected unique-human profile.  The
+   item parameters carry the artifact material, purpose, and any
+   profile-defined presentation parameters.
+
+   A Human-Continuity item MUST include the artifact and purpose
+   parameters.
+
+   A Human-Continuity field represents the client's selected
+   presentation for the request.  A client MUST NOT generate more than
+   one Human-Continuity field line for a request.  This version does not
+   define composition of multiple human-continuity presentations in one
+   request.
+
+   A verifier MUST parse the Human-Continuity field value as a
+   Structured Field Item.  If the field value cannot be parsed as an
+   Item, the Human-Continuity signal is invalid.  A comma-separated
+   combined field value is therefore invalid.
+
+   Example:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   Human-Continuity: "com.example.unique-human.v1"; \
+     artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
+     purpose="free_tier_signup"
+
+   A client MUST NOT present an artifact bound to a realm, attestation
+   audience, or purpose other than the effective realm, effective
+   attestation audience, and purpose for which the artifact is valid.  A
+   verifier MUST validate the artifact according to its profile before
+   using it for policy.
+
+   The artifact is one parameter inside the presentation item; holder-
+   bound request signing covers the human-continuity Structured Field
+   component, not the artifact bytes alone.
+
+7.4.  Common Field Parameters
+
+   The following parameters are defined for the fields in this document.
+   Profiles MAY define additional parameters.  A profile MUST NOT define
+   a parameter whose name is defined in this section.
+
+   artifact: sf-binary.  Defined only for Human-Continuity, where it is
+   required.  Carries the serialized unique-human artifact required by
+   the selected profile.
+
+   purpose: sf-string.  Carries the concrete purpose.  Each Human-
+   Continuity-Challenge list member and Human-Continuity item MUST
+   include the purpose parameter.
+
+   Purpose values MUST be non-empty ASCII strings and MUST NOT contain
+   control characters, whitespace, DQUOTE, backslash, or the brace
+   characters { and }. The brace characters are reserved for the purpose
+   template syntax in policy metadata (Section 8) and never appear in a
+   concrete purpose.  A purpose value that does not satisfy these
+   requirements is syntactically invalid.  Purpose values are case-
+   sensitive.  Clients and verifiers MUST compare purpose values by
+   exact string equality after Structured Field parsing.  Clients and
+   verifiers MUST NOT apply case folding, Unicode normalization, path
+   normalization, percent-decoding, or scope-like expansion to purpose
+   values.
+
+   challenge: sf-binary.  Defined only for Human-Continuity-Challenge,
+   where it is required.  Carries a verifier-provided challenge nonce.
+   Each subsequent presentation MUST contain profile-verifiable evidence
+   that the challenge nonce was used as an input to the selected
+   profile's issuance or presentation process according to Section 11.3.
+
+   Verifier-generated challenge nonces MUST be unpredictable to clients
+   before issuance, MUST be generated with at least 128 bits of entropy,
+   and MUST be encoded as exactly 32 octets.
+
+   presentation-assurance: sf-string.  Identifies a presentation-
+   assurance value.  The parameter can appear on Human-Continuity-
+   Challenge and Human-Continuity.  Its semantics are defined in
+   Section 7.5.
+
+7.5.  Presentation Assurance
+
+   Presentation assurance lets an origin request or receive an assertion
+   that a presentation satisfies an additional assurance property.
+
+   Presentation-assurance values MUST be non-empty ASCII strings and
+   MUST NOT contain control characters, whitespace, DQUOTE, or
+   backslash.  Values are case-sensitive and compared by exact string
+   equality.
+
+   This document defines initial presentation-assurance values as common
+   assurance classes.  The selected profile defines how those values are
+   satisfied, including evidence, ceremonies, verifier checks,
+   freshness, replay behavior, privacy properties, limitations, and
+   satisfaction or substitution relationships.
+
+   Initial presentation-assurance values are:
+
+   *  "human-approved": Profile-defined evidence that a human's approval
+      covers the presentation.  Approval can be granted per presentation
+      or as standing consent, such as a client or authenticator setting
+      that authorizes generating presentations of a given class
+      automatically.  Human interaction is not required when the
+      evidence is generated.  It does not by itself establish
+      participation by the subject.
+
+   *  "human-verified": Profile-defined evidence that a human was
+      prompted and completed a user verification interaction when the
+      evidence was generated, such as local user verification, user
+      verification by a human-controlled authenticator, or another
+      profile-defined verification ceremony.  It does not by itself
+      establish participation by the subject.
+
+   *  "subject-present": Profile-defined evidence that the subject
+      participated when the evidence was generated.  This document does
+      not mandate any specific ceremony or mechanism for establishing
+      the subject's participation.
+
+   A profile that supports presentation-assurance values, including the
+   initial values defined by this document, MUST define the meaning of
+   each supported value, the evidence required, verifier checks,
+   freshness requirements, replay behavior, privacy properties,
+   limitations, and any satisfaction or substitution relationships
+   between values.
+
+   A profile MAY define that one presentation-assurance value satisfies
+   another presentation-assurance value for that profile.  For example,
+   a profile might define "subject-present" as satisfying "human-
+   verified".  A verifier MUST NOT apply such substitution unless the
+   selected profile explicitly defines it.  The initial values defined
+   by this document are ordered by increasing assurance, from "human-
+   approved" to "subject-present".  A stronger value does not satisfy a
+   weaker value unless the selected profile defines that substitution.
+
+   A verifier MUST NOT treat the same presentation-assurance value as
+   equivalent across different profiles unless the relevant profile
+   specifications define compatible semantics.
+
+   When presentation-assurance appears on Human-Continuity-Challenge, it
+   requests a presentation satisfying that value for the challenge
+   context (Section 11.3).
+
+   When presentation-assurance appears on Human-Continuity, it
+   identifies the presentation-assurance value asserted by the client
+   for that presentation.
+
+   If the presentation responds to a Human-Continuity-Challenge that
+   included presentation-assurance, the Human-Continuity field MUST
+   include the same value, unless the selected profile explicitly
+   defines the asserted value as satisfying the requested value.
+
+   A verifier MUST NOT treat a requested or asserted presentation-
+   assurance value as satisfied unless the selected profile verifies the
+   required evidence according to that profile.  If the asserted value
+   differs from the requested value, the verifier MUST NOT treat the
+   request as satisfied unless the selected profile defines the asserted
+   value as satisfying the requested value.
+
+   Because presentation-assurance is a single parameter value, an origin
+   that needs to challenge for multiple values that are not
+   substitutable under the selected profile represents them as separate
+   Human-Continuity-Challenge list members.  Policy metadata can
+   authorize multiple values using presentation_assurances.
+
+   Additional presentation-assurance values intended for use across
+   profiles SHOULD be registered in the Human-Continuity Presentation
+   Assurance Value registry (Section 21.3).  Values that are not
+   registered MUST use a name controlled by the author of the
+   specification that defines the value, such as a reverse-DNS name or a
+   value prefixed by the profile identifier.
+
+8.  Policy Metadata
+
+   Policy metadata lets clients discover default policy selectors,
+   policy selectors, policies, authorized purposes and purpose
+   templates, realms, supported profiles, and presentation-assurance
+   values.  Metadata also establishes the trust boundaries within which
+   inline fields are interpreted.
+
+   Policy metadata is a JSON document [RFC8259] served with media type
+   application/json.  Policy metadata uses an origin-level well-known
+   location.
+
+   If a JSON object within a policy metadata document contains duplicate
+   member names, the document is invalid and MUST NOT be used.
+
+8.1.  Origin-Level Metadata
+
+   The origin-level policy metadata location is:
+
+   https://example.com/.well-known/human-continuity
+
+   The metadata document's origin member MUST equal the canonical HTTPS
+   origin that serves the metadata.
+
+   The metadata document is the human-continuity policy for the
+   canonical HTTPS origin.
+
+8.2.  Selectors and Policy Entries
+
+   An origin-level metadata document MUST include policies,
+   policy_selectors, and default_policy_selectors members.
+
+   A default policy selector is analogous to a default route: it maps an
+   HTTP method to one policy identifier when no policy selector matches
+   the request path for that method.
+
+   Each policies member value is a policy definition.  A policy
+   identifier is an origin-local name used to select one policy
+   definition.  For single-endpoint APIs such as GraphQL or RPC, one
+   policy identifier can describe the HTTP endpoint while individual
+   purposes or purpose templates describe continuity contexts authorized
+   within that endpoint.  A policy definition does not apply to a
+   request merely because it exists in policy metadata.  A request
+   selects a policy only through the policy selection algorithm, using
+   policy_selectors or default_policy_selectors.
+
+   Within one policy metadata document, if two purpose entries in
+   different policies can authorize the same concrete purpose, those
+   entries MUST specify the same realm.  Two purpose entries in
+   different policies can authorize the same concrete purpose if their
+   names are the same purpose, if one entry's name is a purpose that the
+   other's purpose template would authorize, or if both names are
+   purpose templates and one template prefix is a prefix of the other,
+   including equal prefixes.  This check is computable from the entry
+   names alone, without enumerating concrete purposes.  If two such
+   entries specify different realms, the metadata document is invalid
+   and MUST NOT be used.  This prevents the same continuity set from
+   producing different continuity_handle values solely because different
+   request methods, paths, or purpose entries selected different realms.
+   Different purposes MAY use different realms.
+
+   Each policy_selectors member name and each default_policy_selectors
+   member name MUST be a valid HTTP method token.  Each path pattern
+   member name under a policy_selectors method member MUST be a valid
+   path pattern.  Each policy_selectors path pattern member value and
+   each default_policy_selectors member value MUST identify exactly one
+   policy definition in the same metadata document.
+
+   This version defines only exact path patterns, terminal "/**" subtree
+   patterns, exact method token matching, exact purpose matching, and
+   the limited purpose template syntax defined below.  No other matching
+   behavior is implied.
+
+8.3.  Metadata Members
+
+   A policy metadata document has the following members.
+
+   origin: REQUIRED string.  The canonical HTTPS origin described by
+   this metadata document.
+
+   default_policy_selectors: REQUIRED object.  Each member name is an
+   HTTP method token.  Each member value is the policy identifier
+   selected when no policy selector matches the request path for that
+   method.
+
+   policy_selectors: REQUIRED object.  Each member name is an HTTP
+   method token.  Each member value is an object whose member names are
+   path patterns and whose member values are policy identifiers for that
+   method.
+
+   policies: REQUIRED object.  Each member name is a policy identifier
+   and each member value is a policy definition.
+
+   Policy identifiers MUST use the HTTP token syntax defined by
+   [RFC9110], Section 5.6.2.  Policy identifiers are case-sensitive and
+   compared by exact string equality.
+
+   Each policy_selectors method object has path pattern member names.  A
+   path pattern MUST begin with "/", MUST NOT be "/", MUST NOT be "/**",
+   MUST NOT begin with "/.well-known/", MUST NOT contain dot-segments,
+   as defined by [RFC3986], and MUST NOT contain an empty path segment,
+   that is, the character sequence "//".  A path pattern either contains
+   no wildcard or ends with "/**".  The wildcard character "*" MUST NOT
+   appear anywhere else.
+
+   An exact path pattern, such as "/account/recovery" or "/account/
+   recovery/", matches only that request path.  An exact path match
+   takes precedence over subtree matching.  A subtree pattern, such as
+   "/account/recovery/**", matches request paths below that prefix.  If
+   no exact path match exists, the most specific matching subtree
+   pattern takes precedence.
+
+   The value of each path pattern member is the policy identifier
+   selected by that policy selector.
+
+   Each policy definition has the following members.
+
+   purposes: REQUIRED object.  Each member is a purpose entry whose name
+   is either a purpose or a purpose template.
+
+   The purposes object MAY be empty.  A selected policy whose purposes
+   object is empty authorizes no challenges or presentations for
+   requests that select it.  Combined with the prohibition on post-
+   selection fallback, an empty purposes object lets an origin
+   explicitly exclude paths and methods from human-continuity policy
+   that a default policy selector or less-specific subtree pattern would
+   otherwise apply.
+
+   A purpose listed as an entry name authorizes exactly that purpose.
+
+   A purpose template uses the purpose value syntax, except that it
+   contains { and } as template delimiters: it contains exactly one
+   delimiter sequence :{, has non-empty text before the delimiter, has a
+   non-empty variable name after the delimiter, contains no other { or }
+   characters, and ends with }. The template prefix is the substring
+   before {, including the preceding colon.  The template variable name
+   is the substring between { and } and is documentation only.  A
+   purpose template authorizes a concrete purpose only if the concrete
+   purpose begins with the template prefix and contains at least one
+   additional character after the template prefix.  For example, the
+   purpose template "promo:{campaign}" has the template prefix "promo:"
+   and authorizes concrete purpose values such as "promo:summer-sale",
+   but not "promo:".
+
+   The concrete purpose, not the purpose template or variable name, is
+   part of the continuity scope.
+
+   Template prefixes MUST NOT overlap within one policy definition.  Two
+   template prefixes overlap if one concrete purpose value can match
+   both templates.  If a policy definition contains overlapping template
+   prefixes, the metadata document is invalid and MUST NOT be used.
+
+   If an entry name contains { or } but does not satisfy the purpose
+   template syntax, the metadata document is invalid and MUST NOT be
+   used (Section 8.5).  Because concrete purpose values cannot contain {
+   or } (Section 7.4), a purpose template is never exactly equal to a
+   concrete purpose.
+
+   Clients and verifiers MUST compare purposes by exact string equality
+   after Structured Field parsing of the purpose field parameter.  They
+   MUST compare purpose templates by exact string prefix matching
+   against the concrete purpose value after Structured Field parsing,
+   including the requirement that at least one character follows the
+   template prefix.  They MUST NOT apply case folding, Unicode
+   normalization, path normalization, percent-decoding, glob matching,
+   regular expression matching, or URI template matching.
+
+   A purpose entry carries the following members.
+
+   realm: REQUIRED string.  The realm used for this purpose entry.
+   Realm values used for continuity scope comparison are compared by
+   exact string equality.
+
+   profiles: REQUIRED non-empty object.  Each member is a profile entry
+   whose name is a profile identifier and whose value describes how that
+   profile can be used with this policy and purpose entry.
+
+   Profile identifiers in policy metadata use the syntax defined in
+   Section 10.1.  They are case-sensitive and compared by exact string
+   equality.
+
+   Each profile entry has the following members.
+
+   presentation_assurances: OPTIONAL array.  If present, it MUST consist
+   of one or more unique strings, each satisfying the presentation-
+   assurance value syntax in Section 7.5.  Each value is directly
+   authorized for this profile entry and can be requested in Human-
+   Continuity-Challenge or asserted in Human-Continuity even if the
+   challenge did not request it.  If omitted, policy metadata does not
+   authorize presentation-assurance support for this profile entry.
+
+   Profile entries are the profile-scoped extension point (Section 8.5).
+
+8.4.  Authorization by Policy Metadata
+
+   A challenge or presentation is authorized by policy metadata when it
+   satisfies the requirements of this section, which authorize,
+   together, the request method, the effective policy identifier, the
+   effective realm, the concrete purpose, the selected profile, and the
+   selected presentation-assurance value, if any.  The effective
+   attestation audience is derived from the request according to
+   Section 6.4.
+
+   For an effective policy identifier, an inline challenge or
+   presentation is authorized by policy metadata only if the concrete
+   purpose selects a single purpose entry according to Section 6.4 and
+   the selected purpose entry's profiles object contains a profile entry
+   whose name equals the selected profile and that satisfies all
+   applicable requirements.
+
+   The selected purpose entry MUST contain exactly one realm.  The
+   selected purpose entry's name MUST equal the purpose field parameter
+   or, for a purpose template, MUST match it according to the purpose
+   template rules in Section 8.3.  The selected profile entry is the
+   profile entry whose name equals the profile field value.  If a
+   presentation-assurance value is requested, the selected profile entry
+   MUST include that value in presentation_assurances.  If a
+   presentation-assurance value is asserted, the selected profile entry
+   MUST include the asserted value in presentation_assurances, unless
+   the selected profile defines the asserted value as satisfying a
+   requested value included by that profile entry.
+
+   Policy metadata can constrain purpose, profile use, and presentation-
+   assurance values for a profile.  It MUST NOT redefine the profile's
+   specified privacy properties, holder binding requirements,
+   presentation-assurance semantics, continuity_handle semantics, replay
+   model, artifact syntax, or artifact size behavior.
+
+8.5.  Metadata Precedence and Trust
+
+   Policy metadata defines default policy selectors, policy selectors,
+   policies, trusted realms, authorized purposes, supported profiles,
+   and presentation-assurance values.
+
+   Fetched policy metadata is authoritative only as a policy statement
+   by the origin that serves it.
+
+   Configured metadata is a policy metadata or realm metadata document
+   provisioned through a trusted out-of-band mechanism instead of being
+   fetched.  It is authoritative only to the extent of the mechanism
+   that provisioned it and is otherwise processed using the same rules
+   as the corresponding fetched document.  A configured policy metadata
+   document's origin member MUST exactly match the canonical HTTPS
+   origin for which it was provisioned.  A configured realm metadata
+   document's realm member MUST exactly match the realm for which it was
+   provisioned.
+
+   A client MUST NOT use policy metadata unless it was obtained over
+   HTTPS from the origin-level metadata location for the request's
+   canonical HTTPS origin, or it is valid configured policy metadata for
+   that canonical HTTPS origin.  In both cases, the policy metadata
+   document's origin member MUST exactly match that canonical HTTPS
+   origin.
+
+   A fetched document MUST NOT be used as policy metadata or realm
+   metadata unless the response of the fetch has status code 200 and the
+   media type required for that document, matching metadata retrieval in
+   [RFC9728].  Policy metadata fetches and realm metadata fetches using
+   this document's well-known mechanism MUST NOT follow cross-origin
+   redirects.
+
+   Realm origins and other URLs obtained from fetched metadata are
+   untrusted.  Unless trusted local configuration authorizes the exact
+   private destination, a client or verifier fetching such a URL MUST
+   reject any IP literal or resolved address that is loopback, link-
+   local, private-use, multicast, unspecified, or otherwise not globally
+   routable; fetched metadata cannot grant this exception.  That client
+   or verifier MUST validate every connection target, including
+   redirects, connect only to the validated address, and send no
+   automatically attached cookies, Authorization credentials, or human-
+   continuity fields.
+
+   HTTPS protects the fetch.  Beyond that, this specification does not
+   authenticate the origin's policy choices or protect against
+   compromised origin infrastructure.
+
+   A policy metadata or realm metadata document MAY contain members not
+   defined by this document.  A client or verifier MUST ignore an
+   unrecognized member of the document, of a policy definition, or of a
+   purpose entry.  Profile entries in both documents are the profile-
+   scoped extension point: a profile MAY define additional members in
+   its profile entry.  Such members are owned by that profile, are
+   interpreted only when that profile is selected, and MUST NOT redefine
+   or override members defined by this document.  A client or verifier
+   MUST ignore any such member it does not understand or that belongs to
+   a profile it does not implement.
+
+   Where this document assigns syntax to JSON member names, a name that
+   fails the syntax for its position invalidates the metadata document
+   and MUST NOT be ignored as unrecognized.  This applies to member
+   names used as HTTP method tokens, path patterns, policy identifiers,
+   purposes, purpose templates, or profile identifiers.  For profile
+   identifiers, this invalidity rule covers only the string syntax in
+   Section 10.1; clients and verifiers do not validate the reverse-DNS
+   naming structure.
+
+   A profile-defined member that carries a URL for an endpoint,
+   verification material, or verification procedure MUST require that
+   URL to use the "https" URI scheme.  A profile-defined member that
+   conveys material by another means MUST define the authenticated
+   retrieval or trust model for that material.
+
+   Inline fields describe the current response's challenged human-
+   continuity requirements or the current request's presentation.  They
+   MUST NOT cause a client to trust a realm, attestation audience,
+   purpose, profile, method-to-policy selection, or policy identifier
+   that it would not otherwise trust.
+
+   A client encountering an inline reference to an unknown profile or
+   profile-specific field parameter SHOULD refresh fetched policy
+   metadata over HTTPS or revalidate configured policy metadata before
+   proceeding.  If the refreshed or revalidated metadata does not
+   authorize the selected profile or presentation-assurance value for
+   the selected policy and purpose, the client MUST NOT proceed.
+
+   A client MAY rely on cached policy metadata only while that metadata
+   remains valid under its cache directives and the client's configured
+   freshness limits.  A client MAY rely on configured policy metadata
+   only while that metadata remains valid under the client's configured
+   freshness limits.  If fresh metadata cannot be obtained and no valid
+   cached or configured metadata authorizes the concrete purpose,
+   profile, and presentation-assurance value when present, the client
+   MUST NOT proceed.
+
+   Inline fields MAY select or narrow profile, purpose, and
+   presentation-assurance parameters within the policy selected by the
+   request and policy metadata.  Inline fields MUST NOT broaden
+   authorized purposes, profile choices, or presentation-assurance
+   values authorized by policy metadata.
+
+   If the challenge or presentation is not authorized by policy metadata
+   (Section 8.4), the client MUST ignore the inline value and MUST NOT
+   obtain or present a unique-human artifact based on it.
+
+9.  Realm Metadata
+
+   Realm metadata describes realm operator capabilities, issuance
+   endpoints, profile-defined verification and revocation information,
+   and unique-human profile support.  The verification material and
+   verification procedure for a profile are defined by that profile.
+
+   Depending on the profile, verification material can be a JWK Set
+   [RFC7517], a zero-knowledge verifying key or circuit identifier, a
+   contract address and a source of ledger state, a transparency log or
+   accumulator reference, or no fetched material at all.  This document
+   defines no verification material member of its own and privileges no
+   verification material form.
+
+   After selecting the effective realm from policy metadata, a client or
+   verifier MUST NOT treat that realm as supporting the selected profile
+   unless support is indicated by one of:
+
+   *  realm metadata obtained for the effective realm using the well-
+      known mechanism defined below;
+
+   *  configured realm metadata for the effective realm (Section 8.5);
+      or
+
+   *  realm metadata obtained as defined by the selected profile
+      (Section 10).
+
+   If realm metadata required for the selected profile is missing,
+   cannot be obtained, or is stale beyond the freshness limit defined by
+   the profile or origin, a client MUST NOT obtain or present an
+   artifact based on that realm metadata, and a verifier MUST treat the
+   presentation as unverifiable for that profile.  This applies to every
+   source above.
+
+   The rest of this section defines the well-known mechanism.  It
+   applies only when the effective realm is a canonical HTTPS origin
+   (Section 6.1); obtaining realm metadata for any other effective
+   realm, such as a non-HTTPS identifier or one that carries a path,
+   query, fragment, or userinfo, is defined by the selected profile
+   (Section 10).
+
+   The realm metadata location is formed by appending /.well-known/
+   human-continuity-realm to the effective realm:
+
+   https://realm.example/.well-known/human-continuity-realm
+
+   The realm metadata document is a JSON document [RFC8259] served with
+   media type application/json, and is fetched subject to the
+   requirements of Section 8.5.  Its realm member MUST exactly match the
+   effective realm.  The document indicates support for the selected
+   profile through a realm profile entry for that profile; absence of
+   that entry means realm metadata for the selected profile is missing.
+
+   If a JSON object within the document contains duplicate member names,
+   the document is invalid and MUST NOT be used.
+
+   A realm metadata document has the following members.
+
+   realm: REQUIRED string.  The realm the document describes.  It MUST
+   match the realm under which artifacts are produced.
+
+   profiles: REQUIRED non-empty object.  Each member is a realm profile
+   entry whose name is a profile identifier and whose value describes
+   the realm's support for that profile.
+
+   Profile identifiers in realm metadata use the syntax defined in
+   Section 10.1.  They are case-sensitive and compared by exact string
+   equality.
+
+   Each realm profile entry has the following members.
+
+   issuance_endpoint: OPTIONAL string.  The HTTPS URL of the endpoint
+   used to request issuance, if the profile uses an HTTP issuance
+   endpoint.
+
+   A profile whose artifacts are verified against a JWK Set, a verifying
+   key, or other fetched verification material defines the member that
+   conveys it; lifecycle and compromise requirements for that material
+   are defined in Section 10.  A profile that supports revocation
+   likewise defines the member that conveys revocation metadata.
+
+   max_artifact_size_issued: OPTIONAL positive integer.  An upper bound,
+   in octets, on the serialized artifact value produced for this profile
+   under the realm metadata entry, whether the artifact is issued
+   directly or constructed by the client from operator-provided
+   material.  If omitted, the realm operator makes no artifact size
+   commitment for this profile entry.  Origins use this value when
+   deciding whether to accept the profile.  This value does not
+   guarantee that an intermediary will accept that artifact size.
+
+   Revocation semantics are profile-defined.  This document does not
+   require origins to perform online revocation checks on the request
+   path.
+
+   Realm profile entries are the profile-scoped extension point
+   (Section 8.5): for example, a profile can define a verifying key
+   reference and circuit identifier for a zero-knowledge profile, or a
+   chain identifier, verifier contract, and source of ledger state for a
+   profile verified against distributed ledger state.
+
+10.  Unique-Human Profiles
+
+   The core specification defines no initial unique-human profiles.
+
+   This document defines the HTTP discovery, challenge, presentation,
+   and verification framework.  It is not independently deployable
+   without at least one unique-human profile that defines artifact
+   syntax, issuance, verification, holder binding, challenge nonce
+   binding, replay behavior, privacy properties, and continuity_handle
+   derivation.
+
+   Profile specifications MAY be published independently of this
+   document.  Profile identifiers follow the syntax and naming rules in
+   Section 10.1.  Publication of a profile does not imply that the
+   profile is preferred, mandatory, or endorsed by this core
+   specification.
+
+   Profiles SHOULD support local verification by the origin.  The core
+   protocol does not require the origin to call the realm operator on
+   the request path.
+
+   Implementations and interoperability reports for this protocol SHOULD
+   identify the unique-human profile or profiles used for testing.  A
+   core implementation that only parses the HTTP fields and metadata,
+   but does not implement a concrete profile, is not sufficient to
+   demonstrate end-to-end interoperability.
+
+10.1.  Profile Identifiers
+
+   Profile identifiers are non-empty, case-sensitive ASCII strings
+   carried as Structured Field string values and compared by exact
+   string equality.  Profile identifiers SHOULD be short enough for
+   practical use in HTTP fields and MUST NOT contain control characters,
+   whitespace, DQUOTE, or backslash.
+
+   A profile identifier MUST use a reverse-DNS prefix within a domain
+   controlled by the profile author, such as "com.example.unique-
+   human.v1".  The profile author is responsible for taking reasonable
+   precautions to ensure that it controls the portion of the DNS
+   namespace from which the identifier is derived, so that independently
+   defined profiles do not collide.
+
+   The domain in a profile identifier identifies the author of the
+   profile specification.  It implies nothing about the realm of any
+   artifact: a profile can be supported by any number of realms, and the
+   effective realm is selected by policy metadata (Section 6.4)
+   independently of the profile identifier's namespace.
+
+   A profile identifier is permanently bound to the specification that
+   defines it.  A revision that changes artifact syntax, verification
+   behavior, challenge nonce binding, replay behavior, or
+   continuity_handle derivation MUST use a new profile identifier, such
+   as one with an incremented version suffix.
+
+   The naming rules in this section bind profile specifications, not
+   protocol participants.  Clients and verifiers compare profile
+   identifiers as opaque strings and do not validate naming structure or
+   domain control.
+
+10.2.  Specification Requirements
+
+   A profile specification MUST define:
+
+   *  profile identifier;
+
+   *  artifact syntax;
+
+   *  issuance model;
+
+   *  issuance accessibility constraints, such as device, connectivity,
+      enrollment, biometric, or jurisdictional requirements that
+      determine which humans can obtain an artifact;
+
+   *  verification algorithm;
+
+   *  the trust anchors and verification material used by the
+      verification algorithm, and verifier behavior for selecting that
+      material, for its freshness and refresh, for rotation (including
+      overlap and retirement), and for missing or stale material, and
+      the response to compromise of that material;
+
+   *  the conditions under which verification fails, and the state those
+      conditions produce in verifier output;
+
+   *  realm metadata requirements;
+
+   *  how the artifact binds the continuity_handle to the realm,
+      attestation audience, and purpose;
+
+   *  holder binding requirements;
+
+   *  challenge nonce binding, as required by Section 11.3;
+
+   *  replay or double-spend behavior;
+
+   *  whether revocation is supported; and, if supported, what can be
+      revoked, the member that conveys revocation metadata, how
+      verifiers discover revocation state, the maximum staleness a
+      verifier accepts for revocation state, whether revocation is
+      forward-looking only or affects previously accepted presentations,
+      and verifier behavior when revocation metadata is unavailable;
+
+   *  supported presentation-assurance values, if any, including
+      evidence, verifier checks, satisfaction relationships with other
+      values, freshness requirements, replay behavior, privacy
+      properties, and limitations;
+
+   *  profile-specific HTTP field parameters, if any, including syntax,
+      applicable fields, optional or mandatory status, and processing
+      rules; these parameters MUST NOT replace or redefine parameters
+      defined by this document;
+
+   *  verifier output;
+
+   *  continuity_handle format and semantics, including length, opacity,
+      collision resistance, non-malleability, stability, comparison
+      rules, and profile-specific validation rules;
+
+   *  lifecycle behavior affecting continuity_handle stability or
+      validity, including recovery, credential refresh, re-enrollment,
+      rotation of realm operator trust material, realm migration,
+      revocation, and realm operator compromise, when applicable;
+
+   *  privacy properties; and
+
+   *  security considerations specific to the profile.
+
+   A profile MUST define its state, recovery, and device continuity
+   model.  For profiles that are not intended for long-lived, multi-
+   device, or recoverable use cases, this can be an explicit statement
+   that loss of client-held state prevents future presentations,
+   requires re-issuance that preserves the continuity_handle invariant,
+   or causes affected artifacts or verification states to become invalid
+   or unverifiable.  It MUST specify:
+
+   *  what private state is held by the client, holder, realm operator,
+      and verifier;
+
+   *  whether loss of client-held state prevents future presentations;
+
+   *  whether a holder can migrate to a new device and still obtain
+      artifacts that produce the same continuity_handle for an existing
+      continuity scope;
+
+   *  how holder key rotation, credential refresh, recovery, re-
+      enrollment, rotation of realm operator trust material, realm
+      migration, revocation, or realm operator compromise affects
+      presentation validity, verifier output, and continuity_handle
+      stability;
+
+   *  how a verifier discovers realm operator compromise and how it
+      treats artifacts issued before compromise detection;
+
+   *  whether recovery requires realm operator interaction, user re-
+      authentication, biometric re-verification, account recovery,
+      social recovery, hardware-backed key recovery, or another
+      mechanism; and
+
+   *  what privacy or abuse risks are introduced by the recovery
+      mechanism.
+
+   Profiles that rely on unrecoverable client-local state MUST declare
+   that property explicitly.  Profiles that support recovery or device
+   migration MUST define how they preserve scoped human-continuity
+   semantics without exposing a global human identifier or enabling
+   correlation outside the continuity scope.
+
+10.3.  Human-Continuity Handle Requirements
+
+   A profile that does not produce a continuity_handle for a valid
+   presentation is not conformant with this specification.  A successful
+   verification result for a conforming profile MUST include a verifier-
+   local continuity_handle.
+
+   While a verified human remains eligible and retains the state
+   required by a profile, the profile MUST support repeated valid
+   presentations by that human within the same continuity scope,
+   including presentations bound to different valid challenge nonces.  A
+   successful presentation MUST NOT itself terminate that capability.
+
+   The continuity_handle MUST be opaque and canonically encoded.  Under
+   the profile's documented assumptions, prediction, preimage, and
+   second-preimage resistance MUST be at least 112 bits and SHOULD be at
+   least 128 bits.  Enumeration and malleation MUST be infeasible, and
+   accidental collisions MUST be negligible at the profile's maximum
+   supported population.
+
+   The continuity_handle MUST be cryptographically bound to the
+   continuity scope.  A conforming profile MUST use domain separation or
+   an equivalent construction so that continuity_handle values for
+   different continuity scopes are not correlatable and cannot be
+   transformed into one another.
+
+   The core protocol defines continuity scope and continuity_handle
+   comparison semantics.  Profiles MUST NOT redefine these semantics.
+
+   The continuity scope is the tuple (realm, attestation audience,
+   purpose).  The profile identifier is not part of the continuity
+   scope.
+
+   A verifier MUST compare continuity_handle values only within the same
+   continuity scope.
+
+   For the same realm, attestation audience, purpose, and verified
+   human, a conforming profile MUST produce the same continuity_handle.
+   For different continuity scopes, a conforming profile MUST NOT
+   produce correlatable continuity_handle values.
+
+   For the same realm, attestation audience, and purpose, two different
+   continuity_handle values MUST represent different verified humans,
+   subject to the selected profile's security assumptions and compromise
+   model.
+
+   If the same realm supports multiple profiles for the same attestation
+   audience and purpose, valid presentations under those profiles MUST
+   produce the same continuity_handle for the same verified human.
+   Profiles that cannot satisfy this requirement MUST use distinct
+   realms.
+
+   Excluding the profile identifier from the continuity scope is
+   intentional.  It allows a realm operator to migrate between profiles,
+   or to offer several profiles for the same verified human population,
+   without causing the same human to receive different verifier-visible
+   continuity_handle values for the same realm, attestation audience,
+   and purpose.  A realm operator that cannot preserve the invariant
+   across its profiles MUST use distinct realms, which places those
+   profiles in distinct continuity scopes.
+
+   Conversely, multiple realms MAY support the same profile.  Each
+   effective realm forms a distinct continuity scope, even when their
+   realm operators attest the same underlying credential population or
+   rely on the same verification material.
+
+   Differences in profile assurance, holder binding, replay behavior,
+   artifact syntax, issuance ceremony, verification method, or other
+   profile properties are inputs to verifier output or origin policy.
+   They MUST NOT be represented by changing the continuity_handle for
+   the same continuity scope and verified human.
+
+10.4.  Privacy Properties
+
+   Profile privacy properties MUST include:
+
+   artifact_linkability: What linkability is exposed by observing the
+   artifact or presentation, independent of any continuity_handle in
+   verifier output.  Examples include single-use artifacts whose content
+   does not link presentations, scope-local artifacts linkable only
+   within the same continuity scope, reusable artifacts whose repeated
+   use is linkable, or another profile-defined model.
+
+   scope_binding: How the artifact cryptographically binds the
+   continuity_handle to the realm, attestation audience, and purpose
+   defined by this specification.
+
+   holder_binding: Whether the profile is holder-bound, and if so how
+   the artifact is bound to the holder key.
+
+   realm_operator_attestation_audience_visibility: Whether the realm
+   operator learns no attestation audience, the attestation audience at
+   issuance, the attestation audience at redemption, or profile-defined
+   attestation audience information.
+
+   realm_operator_purpose_visibility: Whether the realm operator learns
+   no purpose, the purpose at issuance, the purpose at redemption, or
+   profile-defined purpose information.
+
+   realm_operator_challenge_visibility: Whether the realm operator
+   learns no challenge nonce, the challenge nonce at issuance, the
+   challenge nonce at redemption, or profile-defined challenge nonce
+   information.
+
+   realm_metadata_fetch_visibility: What client information, if any, is
+   revealed while obtaining realm metadata for the profile.
+
+11.  Holder-Bound Presentations
+
+   A holder-bound profile prevents a stolen artifact from being useful
+   without the holder key.  This document uses HTTP Message Signatures
+   [RFC9421] as the request signing mechanism for holder-bound profiles.
+
+   Profiles with reusable artifacts SHOULD be holder-bound when artifact
+   disclosure alone would otherwise enable presentation.
+
+   Holder keys and stable references to them, such as key identifiers or
+   thumbprints, can themselves be linkability handles.  Clients MUST use
+   holder keying material scoped no broader than the continuity scope.
+
+11.1.  Binding the Artifact to the HTTP Message Signature Key
+
+   A holder-bound profile MUST define how the verifier obtains or
+   reconstructs the holder signature verification key.
+
+   For JWT-like artifacts that use JWKs to confirm the holder key, a
+   profile can use a confirmation claim [RFC7800].  If the artifact
+   contains a JWK thumbprint confirmation value, the value MUST be the
+   base64url-encoded SHA-256 JWK Thumbprint [RFC7638] of the holder
+   public key.
+
+   When the client presents a holder-bound artifact, it MUST also attach
+   an HTTP Message Signature.  The verifier MUST:
+
+   1.  Verify the unique-human artifact according to its profile.
+
+   2.  Extract the holder signature verification key, key reference, or
+       thumbprint from the artifact according to the profile.
+
+   3.  Resolve the HTTP Message Signature verification key according to
+       the profile.
+
+   4.  Verify the HTTP Message Signature using that key.
+
+   5.  Confirm that the HTTP Message Signature verification key matches
+       the holder binding in the artifact according to the profile.
+
+   6.  Reject the presentation if any binding check fails.
+
+   The keyid parameter in Signature-Input identifies a key.  It does
+   not, by itself, transport the public key or prove that the key is
+   bound to the artifact.  A profile MUST define the key resolution and
+   binding procedure.  The keyid values in this document's examples use
+   the JWK Thumbprint URI form [RFC9278].
+
+11.2.  HTTP Message Signature Requirements
+
+   For holder-bound profiles, the signature input MUST cover, at
+   minimum:
+
+   *  @method;
+
+   *  @target-uri; and
+
+   *  human-continuity, using the sf component parameter defined by
+      [RFC9421].
+
+   A profile MAY require additional covered components based on request
+   method, request content, or profile semantics.
+
+   If a holder-bound presentation includes Content-Digest [RFC9530], the
+   signature input MUST cover the content-digest component.
+
+   The client MUST attach exactly one signature whose tag parameter
+   value is human-continuity; that signature's parameters MUST also
+   include created and expires.  Signatures with other tag values
+   (Section 7.2.7 of [RFC9421]) can coexist on the same message; this
+   document places no requirements on them.
+
+   When the selected profile is holder-bound, the verifier MUST select
+   the signature by that tag value and apply the binding procedure of
+   Section 11.1 to it.  If no signature, or more than one, carries that
+   tag value, the verifier MUST reject the presentation.  The verifier
+   MUST also reject the presentation if the signature's parameters do
+   not include both created and expires, or if, beyond the verifier's
+   clock skew allowance (Section 11.3), the created value is in the
+   future or the expires value is in the past.  Signature labels carry
+   no semantics and intermediaries can relabel signatures (Section 7.2.5
+   of [RFC9421]).
+
+   Profiles MAY require keyid, alg, nonce, or other parameters defined
+   by [RFC9421].  The nonce signature parameter provides request-level
+   replay protection only; it does not satisfy the challenge nonce
+   binding requirement of Section 11.3.
+
+   Other signing requirements are profile-defined.
+
+11.3.  Freshness and Replay Model
+
+11.3.1.  Profile Contract
+
+   A profile MUST define its challenge nonce binding and replay model.
+
+   The profile MUST state how the nonce is carried, consumed, and
+   verified; whether artifacts and separately generated proofs can be
+   reused under one nonce or regenerated for a new nonce; whether
+   identical request-level presentation material can be accepted more
+   than once; and which replay keys it makes applicable.
+
+   All presentations are challenge-bound.  Challenge acceptance mode,
+   artifact reuse, request replay, and per-human policy are separate
+   properties.
+
+11.3.2.  Challenge Context and Acceptance
+
+   A presentation MUST prove that the challenge nonce was an input to
+   the profile's issuance or presentation process.  A verifier MUST
+   reject it as invalid if the nonce is missing, expired, retired, or
+   was not issued for the matching challenge context.  An HTTP Message
+   Signature nonce alone does not meet this requirement.
+
+   The challenge context is the profile, effective realm, effective
+   attestation audience, purpose, and requested presentation-assurance
+   value if any.  Policy metadata independently authorizes each request.
+
+   A verifier MUST assign each nonce a validity interval and MAY retire
+   it early.  It can avoid storing the challenge context, acceptance
+   mode, and validity interval per nonce by cryptographically
+   authenticating them within the nonce.  Replay protection and early
+   retirement can still require authoritative state.
+
+   At issuance, the verifier MUST bind exactly one acceptance mode to
+   the nonce:
+
+   Single-use acceptance: The challenge replay key applies, so at most
+   one presentation bound to the nonce and context can be accepted.
+   This is at-most-once acceptance, not exactly-once application
+   effects.
+
+   Window acceptance: No challenge replay key applies.  Multiple
+   presentations MAY be accepted while the nonce remains valid, subject
+   to profile replay rules.  Without another replay key, a captured
+   request can be replayed during that interval.
+
+11.3.3.  Replay Keys and Final Acceptance
+
+   The challenge replay key is the challenge nonce plus challenge
+   context and MUST NOT vary by artifact, holder key, or signature
+   nonce.  A signature nonce replay key is the challenge nonce,
+   challenge context, HTTP Message Signature nonce, and holder key
+   thumbprint or profile-defined holder identifier.  A profile MAY
+   define other keys but MUST define their scope and applicability.
+
+   After all other validation succeeds and before returning valid, a
+   verifier MUST atomically check and record every applicable replay key
+   in authoritative replay state.  If a key was already recorded, reject
+   as invalid; if the operation cannot complete, return unverifiable.
+
+   Replay state, and any nonce state or key material it depends on, MUST
+   remain available until the presentations it governs can no longer be
+   accepted, including configured clock skew.  Where replay protection
+   or mutable nonce state applies, replicas MUST share authoritative
+   state.  Verifiers SHOULD keep skew small; 60 seconds is RECOMMENDED,
+   and an acceptance interval MUST NOT expand after its replay state is
+   discarded.
+
+11.3.4.  Security Boundary
+
+   Challenge binding establishes freshness at challenge granularity;
+   replay keys prevent repeated acceptance; per-human policy operates
+   separately on continuity_handle.  Holder-bound presentations sign the
+   components required by Section 11.2.  This specification defines no
+   equivalent request binding for bearer presentations.
+
+   A validated challenge proves only that the profile used the verifier
+   nonce.  Evidence for any requested or asserted presentation-assurance
+   value MUST be bound to the profile, effective realm, effective
+   attestation audience, purpose, and challenge nonce.  If the challenge
+   omits presentation-assurance, this document requests no additional
+   presentation assurance.
+
+11.4.  Request Content Binding
+
+   This document does not require Content-Digest on every request with
+   content.  If Content-Digest is present on a holder-bound request, the
+   signature input MUST cover the content-digest component.  A profile
+   MAY require Content-Digest coverage when request content is security-
+   relevant to the attestation decision.
+
+   A request with no content does not require Content-Digest unless a
+   profile explicitly requires a digest of empty content.
+
+   If a request contains content and Content-Digest is not covered by
+   the HTTP Message Signature, the verifier MUST NOT claim that the
+   human-continuity presentation is cryptographically bound to the
+   complete request content.
+
+   For single-endpoint APIs where the application operation is carried
+   in request content, such as GraphQL or RPC over POST, an origin that
+   uses Human-Continuity for operation-specific policy SHOULD select a
+   profile that requires Content-Digest coverage.  If the request
+   content is not covered, the verifier MUST NOT claim that the
+   presentation is bound to a specific operation.
+
+12.  Client Behavior
+
+   A client MAY ignore Human-Continuity-Challenge.
+
+   If a client has no valid policy metadata under which the challenge is
+   authorized (Section 8.4), the client MUST ignore the challenge.  The
+   client MUST also ignore the challenge if the purpose value is absent
+   or syntactically invalid.  Ignoring a challenge means that the client
+   does not obtain or present a unique-human artifact based on that
+   inline value.  This does not require the underlying HTTP request or
+   interaction to fail.
+
+   A client presents only in response to Human-Continuity-Challenge: the
+   concrete purpose, the profile alternatives, the challenge nonce, and
+   any requested presentation-assurance value are carried by the
+   challenge and validated against policy metadata (Section 8.4).  The
+   normal flow is to make the request, receive Human-Continuity-
+   Challenge, and retry according to origin policy.  This governs
+   presentation timing only; a client can hold pre-existing profile
+   enrollment state or reusable artifacts unless the selected profile
+   says otherwise.
+
+   If the selected profile permits artifact reuse, a client MAY retain
+   an artifact bound to a challenge nonce and attempt to use it on
+   subsequent requests matching the challenge context while that nonce
+   remains valid (Section 11.3).  If the profile permits reuse of the
+   same presentation material, the client MAY retain and resend it.
+   Repeat acceptance requires window acceptance and compliance with the
+   profile's replay rules.  When the verifier stops accepting the nonce,
+   it can issue a new Human-Continuity-Challenge, and the client obtains
+   a presentation bound to the new nonce and retries.
+
+   Obtaining a presentation can be expensive: profile issuance or
+   presentation ceremonies can involve realm operator interaction, proof
+   generation, or human interaction.  A client SHOULD bound and back off
+   artifact regeneration when presentations for a request context are
+   repeatedly rejected or repeatedly re-challenged.
+
+   A client that chooses to use this protocol MUST:
+
+   *  parse fields according to [RFC9651];
+
+   *  determine the effective policy identifier, effective realm,
+      effective attestation audience, and purpose according to
+      Section 6.4 and Section 8;
+
+   *  verify that the challenge or presentation is authorized by policy
+      metadata (Section 8.4);
+
+   *  ensure that inline fields do not expand trust beyond metadata;
+
+   *  obtain or select an artifact appropriate for the profile,
+      effective realm, effective attestation audience, and purpose;
+
+   *  ensure that any selected presentation-assurance value requested by
+      Human-Continuity-Challenge is authorized by policy metadata;
+
+   *  ensure that any asserted presentation-assurance value is supported
+      by the selected profile, can be satisfied for the presentation,
+      and either matches the requested value, is defined by the selected
+      profile as satisfying that requested value, or, when no requested
+      value is being satisfied, is itself authorized by policy metadata;
+
+   *  present the artifact only for the effective realm, effective
+      attestation audience, and purpose for which it is valid;
+
+   *  attach an HTTP Message Signature satisfying Section 11.2 when the
+      selected profile is holder-bound; and
+
+   *  avoid exposing artifacts, holder keys, signature material, or
+      bearer-like material to untrusted code, prompt transcripts, logs,
+      shell history, or user-visible text.
+
+   Clients SHOULD store persistent holder keys in platform credential
+   storage when available.  Browser clients using persistent holder-
+   bound keys SHOULD use non-extractable key material, such as non-
+   extractable WebCrypto CryptoKey objects, rather than exportable key
+   material.
+
+13.  Verifier Behavior
+
+   A verifier that receives Human-Continuity MUST parse it according to
+   Section 7.3 and MUST NOT use an invalid Human-Continuity signal as a
+   valid presentation.
+
+   If parsing succeeds, the verifier MUST:
+
+   1.  Determine the request method and effective policy identifier from
+       the request according to Section 6.2.
+
+   2.  Determine the selected profile, purpose, and selected
+       presentation-assurance value, if any, from the parsed Human-
+       Continuity field.
+
+   3.  Determine the effective realm and effective attestation audience
+       according to Section 6.4.
+
+   4.  If the selected profile is supported, verify the artifact
+       according to that profile before using the presentation for
+       policy.
+
+   The verifier MUST NOT treat the presentation as valid unless all of
+   the following hold:
+
+   *  the presentation is authorized by policy metadata (Section 8.4);
+
+   *  the verifier supports the selected profile;
+
+   *  the purpose value is present, syntactically valid, and accepted by
+      origin policy for the request;
+
+   *  the presentation contains profile-verifiable evidence for a
+      challenge nonce the verifier issued for the matching challenge
+      context and still accepts (Section 11.3);
+
+   *  the selected profile verifies that the artifact is bound to the
+      effective realm, effective attestation audience, and purpose.
+
+   A verifier MUST accept a presentation only for the challenge context
+   it issued.  The profile, effective realm, effective attestation
+   audience, purpose, requested presentation-assurance value, and
+   challenge nonce MUST match the challenge, and policy metadata MUST
+   authorize the current request.
+
+   If Human-Continuity-Challenge requested presentation-assurance, the
+   verifier MUST reject the presentation unless the selected profile
+   verifies the required evidence.  The evidence MUST be present, fresh,
+   bound to the same profile, effective realm, effective attestation
+   audience, purpose, and challenge nonce, and satisfy the selected
+   profile's verification rules.
+
+   If Human-Continuity asserts presentation-assurance that the challenge
+   did not request, the verifier MUST apply the selected profile's
+   evidence, freshness, and replay rules for that value.  The verifier
+   MUST NOT accept the asserted assurance unless the required profile-
+   defined evidence is present and valid.
+
+   A verifier MUST enforce the constraints of the selected purpose
+   entry, including the selected profile and presentation-assurance
+   value if any.  The verifier MUST NOT accept a presentation merely
+   because it produces a valid continuity_handle for the same continuity
+   scope.
+
+   A verifier output has one of the following top-level states:
+
+   valid: The artifact and all required presentation proofs are valid,
+   and the verifier has produced a continuity_handle for the selected
+   continuity scope.
+
+   invalid: The artifact or presentation proof is malformed, expired,
+   revoked, bound to a different realm, attestation audience, or
+   purpose, bound to a challenge nonce the verifier did not issue or no
+   longer accepts, fails to produce a required continuity_handle or
+   requested or asserted presentation-assurance evidence, reuses an
+   applicable replay key, or otherwise fails profile validation.
+
+   unverifiable: Validation cannot complete.  Examples include missing
+   or malformed input required to attempt verification; unavailable or
+   unusable policy or realm metadata; unavailable authoritative
+   challenge or replay state, including inability to complete a replay
+   check atomically; an unsupported profile, algorithm, or capability;
+   or an untrusted realm.
+
+   This document does not require an origin to fail a request when a
+   human-continuity presentation is missing, invalid, or unverifiable.
+   Origin policy is out of scope.
+
+   A successful verification result for a conforming profile MUST
+   include at least:
+
+   *  state;
+
+   *  profile;
+
+   *  realm;
+
+   *  attestation_audience;
+
+   *  purpose; and
+
+   *  continuity_handle.
+
+   When a verifier accepts a presentation for which presentation-
+   assurance was requested or asserted, the successful verification
+   result MUST include the verified presentation-assurance value.  The
+   result MAY include additional profile-defined assurance details, such
+   as method, freshness time, or assurance level, provided those details
+   do not violate the selected profile's privacy properties.
+
+   An example of one possible JSON representation:
+
+   {
+     "state": "valid",
+     "profile": "com.example.unique-human.v1",
+     "realm": "https://realm.example",
+     "policy_identifier": "signup",
+     "attestation_audience": "https://service.example",
+     "purpose": "free_tier_signup",
+     "continuity_handle": "opaque-scope-local-value",
+     "presentation_assurance": "subject-present"
+   }
+
+   A successful verification MAY include additional profile-defined
+   attributes.
+
+   A verifier MUST NOT use a valid/invalid attestation result alone to
+   enforce policy decisions that depend on attributing presentations to
+   the same human.  For those decisions, it MUST use the profile-defined
+   continuity_handle, scoped by realm, attestation audience, and
+   purpose.
+
+   A continuity_handle is not an authenticator.  A verifier MUST NOT use
+   a continuity_handle, or equality with a previously stored
+   continuity_handle value or derivative, as the sole basis for
+   authenticating a request, granting account access, or proving control
+   of an account.  A verifier MAY use a continuity_handle as an input to
+   origin policy after applying the origin's native authentication,
+   authorization, or account recovery rules.
+
+   Verifier output MAY report profile- or implementation-defined invalid
+   reasons or unverifiable causes beneath the top-level state.  Origins
+   can surface them as Problem Details [RFC9457].
+
+14.  Caching and Intermediaries
+
+   When human continuity affects whether a request is served, throttled,
+   challenged, or rejected, the component that makes that decision MUST
+   have access to the presentation or to a verifier-derived
+   classification.  When shared caches or CDNs are used, origins MUST
+   ensure that cached responses cannot bypass the intended human-
+   continuity policy under HTTP caching semantics [RFC9111].
+
+   If the selected representation depends on the raw Human-Continuity
+   field value, the origin MUST send:
+
+   Vary: Human-Continuity
+
+   Vary addresses cache correctness only.  It keys cache entries on the
+   raw field value and cannot capture Signature-Input, Signature, or
+   verifier validity state; it stores presented artifact values as
+   shared cache keys and fragments cache entries when presentations
+   contain dynamic signature parameters.  Origins MUST NOT use Vary:
+   Human-Continuity as a validity gate.
+
+   When request handling, the selected representation, the status code,
+   or challenge behavior depends on whether a presentation is present or
+   valid, the origin SHOULD verify the presentation at or before the
+   shared cache and key cached responses on the verifier classification,
+   or mark the affected responses private or no-store.  Origins MUST
+   ensure, through response directives or cache configuration, that a
+   cached response is not reused for a request with a different human-
+   continuity state, unless bypassing origin-side human-continuity
+   policy is acceptable for that response.
+
+   Responses containing Human-Continuity-Challenge SHOULD use Cache-
+   Control: no-store.  A challenge stored by a shared cache can deliver
+   the same challenge nonce to many clients.
+
+15.  Browser and CORS Considerations
+
+   Browser JavaScript clients require origins to expose response fields
+   and allow request fields through CORS.
+
+   Actual resource responses that carry Human-Continuity-Challenge need
+   to expose that response field to browser script:
+
+   Access-Control-Expose-Headers: Human-Continuity-Challenge
+
+   CORS preflight responses need to allow the actual request's method
+   and fields:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   Access-Control-Allow-Methods: GET, POST
+   Access-Control-Allow-Headers: Human-Continuity, Signature-Input, \
+     Signature, Content-Digest
+
+   Human-Continuity-Challenge can appear on successful responses as well
+   as error responses.  Browser clients that use this protocol need to
+   read it on any response for which CORS exposure permits access.
+
+   Exposing Human-Continuity-Challenge to browser script exposes any
+   challenge nonce to that script context.  Challenge nonces are replay
+   protection inputs, and implementations MUST NOT rely on their
+   confidentiality for security.  However, browser clients SHOULD
+   perform artifact selection, use of holder keys, and presentation
+   signing in trusted code paths and SHOULD avoid exposing those
+   capabilities to untrusted third-party scripts, injected scripts, or
+   broadly authorized cross-origin callers.  XSS or script compromise in
+   a context that can access holder keys or presentation APIs enables
+   unauthorized credential use in this protocol.
+
+   This document does not use the Sec- prefix for any field.  The
+   protocol does not rely on browser-reserved field names: clients
+   generate Human-Continuity according to policy, and origins expose
+   Human-Continuity-Challenge through ordinary HTTP and CORS controls.
+
+   Because these fields are ordinary extension-defined HTTP fields,
+   generic user agents, intermediaries, logging systems, and tracing
+   systems will not treat them as sensitive by default.
+
+16.  Status Codes and Error Responses
+
+   An origin MUST NOT use 401 solely to request human continuity under
+   this protocol.  A 401 response is reserved for HTTP authentication
+   challenges and requires WWW-Authenticate [RFC9110].
+
+   A proxy MUST NOT use 407 for this mechanism.  A 407 response is
+   reserved for proxy authentication and requires Proxy-Authenticate
+   [RFC9110].
+
+   Origins MAY use 403, 409, 422, 429, or another status code
+   appropriate to origin policy when issuing a Human-Continuity-
+   Challenge.  Problem Details [RFC9457] can be used to describe the
+   origin policy error, but is not required by this document.
+
+   A Human-Continuity-Challenge received on a 3xx response applies to
+   the request that generated that response, not to the redirect target.
+   A client that follows a redirect MUST NOT send the Human-Continuity,
+   Signature-Input, or Signature field values generated for the original
+   target URI on the redirected request.  The client MUST perform policy
+   selection, effective value determination, artifact selection, and
+   signing for the redirect target as a new request under the redirect
+   target's canonical HTTPS origin and policy metadata.
+
+17.  Header Size and Artifact Size
+
+   This protocol carries artifacts in HTTP fields.  Many origins,
+   frameworks, CDNs, gateways, and proxies enforce limits on request
+   header size.  Large artifacts can trigger 431 Request Header Fields
+   Too Large or intermediary-specific failures.
+
+   max_artifact_size_issued refers to the serialized artifact value as
+   carried in the Human-Continuity field, after any base64, base64url,
+   or Structured Field Byte Sequence encoding has been applied.
+
+   The value excludes the HTTP field name and unrelated field
+   parameters, but includes any delimiters required by the artifact's
+   Structured Field item encoding.
+
+   This limit does not guarantee that every intermediary on the request
+   path will accept the complete HTTP field section.  Origins SHOULD
+   choose conservative values when deployed behind intermediaries with
+   smaller header limits.
+
+   Profiles intended for broad HTTP deployment SHOULD keep artifacts
+   small enough to fit within commonly deployed origin, framework, and
+   intermediary field section limits.  A profile whose proof objects are
+   expected to exceed those limits SHOULD define a compact presentation
+   form, such as a profile-defined exchange token, compact envelope,
+   detached proof reference, or presentation endpoint, rather than
+   requiring raw proof objects to be carried directly in the Human-
+   Continuity field.
+
+   A profile that uses a compact envelope, reference artifact, exchange
+   token, or presentation endpoint MUST define how that presentation
+   form is cryptographically or operationally bound to the realm,
+   attestation audience, and purpose, how it satisfies the profile's
+   holder binding requirements and replay model, and how it produces the
+   verifier output required by this specification.
+
+18.  Privacy Considerations
+
+   A continuity_handle is intentionally linkable within its continuity
+   scope.  This scoped linkability lets origins attribute repeated
+   participation to the same human for purposes authorized by policy
+   metadata.  The privacy goal of this specification is unlinkability
+   across different continuity scopes.
+
+   Cross-scope unlinkability is a property of the selected profile and
+   realm operator behavior, not of the HTTP transport defined by this
+   document.  The core protocol cannot prevent realm operators from
+   colluding, sharing handle derivation material, or intentionally
+   issuing correlatable artifacts.  A profile that claims unlinkability
+   across continuity scopes MUST state its realm operator non-collusion,
+   key separation, and compromise assumptions.
+
+   Continuity handles are not intended to reveal a user's real-world
+   identity or account identity.  A conforming profile MUST make
+   continuity_handle values infeasible to reverse, enumerate, or
+   correlate outside their continuity scope.  However, a
+   continuity_handle can still single out the same human within a scope
+   and may be personal data or a regulated identifier for some origins.
+   Verifiers SHOULD define retention, deletion, and access control
+   policies for stored continuity_handle values and verifier-local
+   derivatives.
+
+   Profiles MUST NOT expose a global human identifier.  Origins SHOULD
+   request or accept human-continuity presentations only for the
+   narrowest purpose that satisfies their declared policy.
+
+   Conforming profiles MUST NOT produce correlatable continuity_handle
+   values for different continuity scopes under their stated security
+   and privacy assumptions.  Verifiers MUST NOT compare
+   continuity_handle values across different continuity scopes.
+
+   The purpose value is privacy-sensitive because it defines the
+   verifier's linkability set.  Audience alone is often too coarse: a
+   signup, comment, promotion claim, support request, API quota, and
+   agent delegation can require different continuity_handle values for
+   the same verifier.  Verifiers SHOULD use separate purpose values for
+   separate business contexts unless origin policy deliberately requires
+   grouping them.
+
+   Purpose templates are privacy-sensitive because they authorize many
+   concrete linkability scopes.  Concrete purposes authorized by a
+   purpose template SHOULD be tied to stable origin policy units and
+   SHOULD NOT encode per-client or per-request tracking material.
+
+   Origins SHOULD provide user awareness appropriate to the breadth,
+   lifetime, and sensitivity of the continuity scope.  Broader scopes,
+   longer-lived continuity_handle values, and recovery or device
+   continuity mechanisms can require stronger user-facing controls.
+   This document does not define the user interaction model.
+
+   A profile might reveal information to the realm operator during
+   issuance, such as requested attestation audience, purpose, profile,
+   challenge nonce, holder key thumbprint, issuance time, or user
+   consent state.  A profile might reveal information to the realm
+   operator during redemption, if it requires online redemption.  Each
+   profile MUST document these realm visibility properties
+   (Section 10.4).
+
+   The discovery fetches defined by this protocol are observable before
+   any presentation.  A policy metadata fetch tells the contacted origin
+   that the client is evaluating human continuity for that origin, but
+   does not by itself disclose activity at other origins.  An on-demand
+   realm metadata fetch (Section 9) tells the realm operator the
+   client's IP address and fetch timing, even for profiles that
+   otherwise reveal nothing to the realm operator at presentation time.
+   Cached or configured metadata (Section 8.5), or profile-defined realm
+   metadata retrieval, can decouple that observation from presentation
+   intent.  Profiles and origins that rely on realm operator non-
+   observation at presentation time SHOULD account for this channel.
+
+   A scoped continuity_handle does not make the whole HTTP request
+   unlinkable outside the profile's cryptographic design.  Origins can
+   still observe IP address, cookies, native authorization, TLS
+   properties, client behavior, user-agent information, application
+   identifiers, and timing.
+
+   Clients and origins SHOULD treat artifacts, continuity_handle values,
+   and signature material as sensitive.  They can reveal linkability
+   information or permit abuse if leaked, depending on profile
+   semantics.
+
+   Verifiers SHOULD avoid logging raw continuity_handle values.  When
+   storing continuity_handle values persistently, verifiers SHOULD use a
+   verifier-local protected derivative, such as a keyed hash over the
+   continuity scope and continuity_handle, when operationally feasible.
+
+18.1.  Privacy Threats
+
+   This section relates the protocol to the privacy threats in Section 5
+   of [RFC6973], concentrating on those a human-continuity mechanism
+   raises most directly.  In each, the continuity scope (Section 6.4) is
+   the boundary that contains the threat, and the requirements stated
+   earlier in this section are the floors that constrain it.  The
+   threats of stored data compromise and disclosure described in
+   [RFC6973] apply to artifacts, signature material, and stored
+   continuity_handle values as sensitive data and are treated under
+   Section 20.
+
+   Surveillance (Section 5.1.1 of [RFC6973]): A realm operator can
+   observe issuance, and online redemption where a profile requires it;
+   a verifier observes the presentations made to it.  A verifier learns
+   a continuity_handle only within the continuity scopes it requests,
+   and what a realm operator learns is made auditable by the per-profile
+   realm visibility documentation required above.  The protocol does
+   not, however, prevent a single realm operator from observing issuance
+   across the scopes it serves, nor realm operators from colluding, as
+   noted above; nor does it conceal the request metadata any HTTP server
+   already sees, such as IP address, cookies, and TLS properties.
+
+   Correlation (Section 5.2.1 of [RFC6973]): A continuity_handle is
+   deliberately correlatable within one continuity scope; that scoped
+   linkability is the mechanism's function.  Correlation across scopes
+   is the threat this specification is built to prevent, through
+   profiles that do not produce correlatable handles for different
+   scopes and verifiers that do not compare handles across scopes.
+   Because a scope is (effective realm, effective attestation audience,
+   purpose), purpose granularity is the principal correlation control: a
+   broad or shared purpose enlarges the set within which the same human
+   is detected, which is why origins are directed to the narrowest
+   purpose and to distinct purposes for distinct contexts.  Linkability
+   that does not derive from the handle, such as a shared IP address or
+   account, lies outside the protocol's cryptographic guarantees.
+
+   Identification (Section 5.2.2 of [RFC6973]): A continuity_handle is a
+   scope-local pseudonym.  Profiles expose no global human identifier,
+   and handles are infeasible to reverse or enumerate outside their
+   scope, so the protocol does not by itself tie a handle to a real-
+   world or account identity.  Within a scope a handle still singles out
+   the same human and can be personal data; an origin that associates it
+   with identifying data it already holds performs that identification,
+   which the retention, deletion, and access control guidance above is
+   meant to constrain.
+
+   Secondary use (Section 5.2.3 of [RFC6973]): Purpose binds each
+   artifact and continuity_handle to the context it was authorized for,
+   and policy metadata makes that context visible and auditable.
+   Linking the same human under a different purpose is a different
+   continuity scope, which conforming profiles keep uncorrelatable and
+   verifiers do not bridge; carrying stable business contexts rather
+   than tracking material in purpose values keeps the use that is
+   authorized aligned with the use that occurs.
+
+18.2.  Exclusion, Accessibility, and Coercion
+
+   Conditioning access to a service on a human-continuity presentation
+   excludes humans who cannot present.  A human may have no access to
+   any realm the origin's policy authorizes, they may lack a required
+   device, or be unable to complete the issuance ceremony.  Client
+   participation is voluntary, and this document does not guarantee that
+   requests backed by human continuity receive different service
+   treatment; making a presentation a precondition for service is an
+   origin policy choice that the protocol neither requires nor defines.
+
+   Origins SHOULD offer an alternative path to the service for humans
+   who cannot or choose not to present, consistent with the guidance to
+   request Human-Continuity only where human continuity is required
+   (Section 1.2).  Where no alternative is offered, the origin SHOULD
+   make the requirement, and the realms it accepts, transparent so that
+   an affected human can understand the basis for exclusion.
+   Conditioning service on presentation can also pressure a human into
+   an issuance ceremony, and the enrollment or identification it
+   entails, that they would otherwise decline; the more sensitive the
+   ceremony, such as one involving biometric enrollment, the stronger
+   this concern.
+
+   Because the holder that presents an artifact can be a client or agent
+   acting for a human, the HTTP presentation mechanism does not assume
+   direct human interaction and is compatible with assistive technology
+   and delegated agents.  Exclusion risk therefore concentrates in
+   issuance and in any subject participation a profile's presentation-
+   assurance requires (Section 7.5); profiles document the accessibility
+   constraints of obtaining an artifact (Section 10), so an origin can
+   assess which humans the operator of an authorized realm can reach.
+
+19.  Implementation Status
+
+   RFC Editor: Please remove this section and the reference to [RFC7942]
+   before publication.
+
+   This section records the implementation status of this specification
+   in accordance with [RFC7942].  It is intended to inform IETF review
+   and working group discussion.  The information has not been
+   independently verified, and listing or omitting an implementation
+   does not imply IETF endorsement.
+
+   As of this -00 version, no complete end-to-end implementation of this
+   HTTP extension or interoperability report for this specification is
+   known to the editor.  Existing unique-human systems may inform future
+   companion profiles, but this document defines no initial profile and
+   does not report any deployment as implementing this specification end
+   to end.
+
+   The example artifacts in this document are implementation aids and
+   are not reported as running implementations.
+
+20.  Security Considerations
+
+   Security depends on clients and verifiers enforcing metadata policy,
+   choosing narrow continuity scopes, preventing disclosure of artifacts
+   and signature material, and preventing unauthorized use of holder
+   keys.
+
+   Artifact and signature disclosure: Human-Continuity fields,
+   Signature-Input, Signature, and derived verifier output can be
+   sensitive even when they are not authentication credentials.
+   Ordinary HTTP infrastructure may log, trace, sample, or inspect
+   extension-defined fields by default.  Origins SHOULD configure
+   redaction or use profiles whose artifacts and signatures are safe
+   under the expected exposure.
+
+   Holder key compromise: If a holder key and its bound artifact are
+   compromised, an attacker can create holder-bound presentations only
+   while the verifier accepts the artifact's challenge nonce and the
+   artifact remains valid.  Profiles SHOULD define holder key rotation
+   and how compromise invalidates keys, artifacts, or outstanding
+   challenges.
+
+   Request binding: Holder signatures cover @method, @target-uri, and
+   Human-Continuity.  This specification defines no equivalent binding
+   for bearer presentations.
+
+   Authenticated principals: The challenge context and mandatory
+   signature coverage do not bind a presentation to Authorization, a
+   session, or an application principal.  Before linking a
+   continuity_handle to a principal, an origin SHOULD either record that
+   principal with the challenge nonce and require the same principal on
+   presentation, or require signature coverage of the request fields
+   used for authentication (Section 13).  Single-use acceptance limits
+   replay but does not provide principal binding (Section 11.3).
+
+   State exhaustion: Required replay and mutable nonce state MUST remain
+   available through its retention deadline.  Capacity, partition, or
+   backend failures MUST fail closed as unverifiable.  Verifiers SHOULD
+   bound lifetimes, rate-limit issuance and verification, and provision
+   replay storage for their acceptance modes.
+
+   Origin, method, and purpose confusion: Clients MUST verify that
+   challenges and presentations are authorized by policy metadata for
+   the request (Section 8.4), including any presentation-assurance
+   value.  Clients MUST NOT infer cross-origin delegation, realm
+   selection, attestation audience selection, purpose authorization,
+   profile support, or presentation-assurance support from inline
+   fields.
+
+   Policy mapping confusion: The effective policy identifier is derived
+   from the request method, request URI, and policy metadata.  Clients
+   and verifiers MUST implement the same matching algorithm.  Origins
+   using reverse proxies, request rewriting, routing normalization, or
+   framework-level path normalization MUST ensure that the verifier
+   computes the effective policy identifier from the externally visible
+   request method and URI used by clients.
+
+   Selector overlap: Path patterns can create policy overlap.  This
+   specification resolves overlap by first checking for an exact path
+   match under the request method.  If no exact path match exists, it
+   considers subtree patterns that match both the request path and
+   request method, then chooses the most specific matching subtree
+   pattern, which is unique because selector member names are unique
+   within one method.  A selector for one method does not shadow a less-
+   specific selector for another method.  Clients and verifiers MUST NOT
+   fall back to a less-specific policy after selecting a policy that
+   does not authorize the request's concrete purpose, profile, effective
+   realm, or presentation-assurance value.
+
+   Path normalization: Clients and verifiers MUST NOT apply percent-
+   decoding equivalence, dot-segment normalization, path case folding,
+   Unicode normalization, framework route matching, filesystem path
+   normalization, or query string matching when selecting a policy
+   identifier.  A request path containing dot-segments MUST NOT match a
+   policy selector or default policy selector under this protocol.
+   Clients and verifiers MUST NOT accept Human-Continuity-Challenge or
+   Human-Continuity for such a request unless a future extension defines
+   safe normalization semantics.  Origins using policy_selectors or
+   default_policy_selectors SHOULD reject requests whose externally
+   visible path contains dot-segments.
+
+   Default policy selectors: Default policy selectors are broad policy
+   selectors.  Origins SHOULD prefer explicit policy selectors.  A
+   default policy selector can cause requests not matched by a policy
+   selector for the request method to authorize purposes or profiles
+   that were intended only for a narrower part of the origin.  An origin
+   can exclude a path and method from a broader default policy selector
+   or less-specific subtree pattern by mapping it to a policy whose
+   purposes object is empty; such a policy authorizes nothing and fails
+   closed.
+
+   Because matching is exact, path forms that differ only by a trailing
+   slash, such as "/x" and "/x/", are distinct paths under [RFC3986] and
+   can select different policy identifiers.  Method forms that differ by
+   case are also distinct.  A request that has no matching policy
+   selector for its method uses default_policy_selectors, if any, rather
+   than an implicit origin-level fallback.  Origins applying request-
+   scoped policy SHOULD cover every protected path in all served forms,
+   by registering each form or by using valid subtree patterns.  Origins
+   trying to cover all paths for a method SHOULD use
+   default_policy_selectors for that method, and SHOULD list every
+   method for which that policy is intended.
+
+   Header injection and stripping: Intermediaries or compromised
+   components might add, remove, or modify human-continuity fields.
+   Inline fields do not select the effective policy identifier,
+   effective realm, or effective attestation audience, and they do not
+   broaden authorized purposes, profile choices, or presentation-
+   assurance values authorized by policy metadata.  Holder-bound
+   presentations cover Human-Continuity in the HTTP Message Signature
+   (Section 11.2).
+
+   Signature coverage: HTTP Message Signatures protect only covered
+   components.  If a component is not covered, a verifier MUST NOT claim
+   that the presentation is bound to that component.
+
+   Request content: If Content-Digest is present on a holder-bound
+   request, the signature input MUST cover the content-digest component.
+   If request content matters to the attestation decision, the
+   applicable profile SHOULD require Content-Digest coverage.
+
+   Metadata fetching: Realm origins and other URLs obtained from fetched
+   metadata are untrusted and are subject to the destination-validation
+   and credential-handling requirements in Section 8.5.
+
+   Metadata freshness: Stale metadata can cause clients or verifiers to
+   use retired realms, verification material, trust anchors, profiles,
+   or policies.  Profiles and origins SHOULD define metadata freshness
+   and refresh behavior.  Origins SHOULD send explicit freshness
+   directives, such as Cache-Control with max-age, on policy metadata
+   responses, on the 404 or 410 responses that establish policy absence,
+   and on realm metadata responses.  Clients SHOULD NOT apply heuristic
+   caching to these documents; absent explicit freshness directives, a
+   client SHOULD revalidate before relying on them.
+
+   Realm operator trust material compromise and rotation: Compromise of
+   realm operator trust material can allow forged artifacts or false
+   continuity_handle values.  This risk applies to every form of
+   verification material and trust anchor a profile uses, including
+   keys, circuits, contracts, ledger state, accumulator roots, and
+   transparency logs.  The lifecycle requirements for verification
+   material in Section 10, together with profile-defined revocation or
+   invalidation behavior where applicable, bound the exposure window.
+
+   Browser holder keys: Non-extractable browser key material can reduce
+   key export risk, but it does not prevent use of the key by
+   compromised same-origin script.  In browser clients, XSS, malicious
+   dependencies, or other same-origin script compromise can therefore
+   permit unauthorized holder key use even when the private key is not
+   extractable.
+
+   Logging and transcripts: Implementations used by agents, model-facing
+   tools, or developer environments SHOULD attach artifacts in trusted
+   transport code and redact the Human-Continuity, Signature-Input, and
+   Signature fields, verifier outputs containing continuity_handle
+   values, and related holder key material from logs and transcripts by
+   default.
+
+   Header size denial of service: Very large artifacts can consume
+   parser memory or trigger header processing failures.  Origins SHOULD
+   enforce size limits before expensive verification.
+
+21.  IANA Considerations
+
+21.1.  HTTP Field Name Registrations
+
+   IANA is requested to register the following fields in the "Hypertext
+   Transfer Protocol (HTTP) Field Name Registry" defined by [RFC9110].
+   The "Structured Type" column is defined by [RFC9651].
+
+    +============================+===========+============+===========+
+    | Field Name                 | Status    | Structured | Reference |
+    |                            |           | Type       |           |
+    +============================+===========+============+===========+
+    | Human-Continuity-Challenge | permanent | List       | This      |
+    |                            |           |            | document  |
+    +----------------------------+-----------+------------+-----------+
+    | Human-Continuity           | permanent | Item       | This      |
+    |                            |           |            | document  |
+    +----------------------------+-----------+------------+-----------+
+
+                                  Table 1
+
+21.2.  Well-Known URI Registrations
+
+   IANA is requested to register the following well-known URIs in the
+   "Well-Known URIs" registry [RFC8615].
+
+   This document uses separate well-known URI suffixes for policy
+   metadata and realm metadata because the policy authority and the
+   realm operator are not necessarily the same party.  Policy metadata
+   is authoritative for default policy selectors, policy selectors,
+   accepted purposes, accepted profiles, presentation-assurance values,
+   and effective realms at the origin and its policies.  Realm metadata
+   is authoritative for the realm operator's capabilities and
+   verification material.  If the same origin acts as both policy
+   authority and realm operator, it MAY serve both metadata documents
+   from that origin.
+
+   +=============+============+===============+=========+=============+
+   | URI Suffix  | Change     | Specification |Status   | Related     |
+   |             | Controller | Document      |         | Information |
+   +=============+============+===============+=========+=============+
+   | human-      | IETF       | This document |permanent| Policy      |
+   | continuity  |            |               |         | metadata    |
+   |             |            |               |         | for Human   |
+   |             |            |               |         | Continuity  |
+   |             |            |               |         | for HTTP    |
+   +-------------+------------+---------------+---------+-------------+
+   | human-      | IETF       | This document |permanent| Realm       |
+   | continuity- |            |               |         | metadata    |
+   | realm       |            |               |         | for Human   |
+   |             |            |               |         | Continuity  |
+   |             |            |               |         | for HTTP    |
+   +-------------+------------+---------------+---------+-------------+
+
+                                 Table 2
+
+21.3.  Human-Continuity Presentation Assurance Value Registry
+
+   IANA is requested to create the Human-Continuity Presentation
+   Assurance Value registry.
+
+   Registered values use the presentation-assurance value syntax defined
+   in Section 7.5 and SHOULD be short enough for practical use in HTTP
+   fields.
+
+   Registration policy: Expert Review [RFC8126].
+
+   The designated experts are instructed to approve a registration when
+   the value's intent is clearly described and distinct from existing
+   entries, and the value is intended for use across more than one
+   profile; values specific to a single profile use author-controlled
+   names as described in Section 7.5 and are not registered.  The
+   experts MAY require a stable, publicly available definition of the
+   value's general intent.  The experts assess only distinctness and
+   clarity of intent: registration does not constitute endorsement of
+   any verification mechanism and does not establish cross-profile
+   equivalence, and the equivalence rules in Section 7.5 apply to
+   registered and unregistered values alike.  The registry is expected
+   to grow slowly.
+
+   Registration requests MUST include:
+
+   *  presentation-assurance value;
+
+   *  description;
+
+   *  specification reference; and
+
+   *  change controller.
+
+   The registry records shared presentation-assurance labels and their
+   general intent only.  The definitions in Section 7.5 are
+   authoritative for the values registered by this document, and how a
+   value is satisfied for a given profile is defined by that profile as
+   required by Section 7.5.  Registration status is not consulted by
+   clients or verifiers at runtime.
+
+   Initial values:
+
+    +=================+=====================+============+===========+
+    | Value           | Description         | Change     | Reference |
+    |                 |                     | Controller |           |
+    +=================+=====================+============+===========+
+    | human-approved  | A human approved    | IETF       | This      |
+    |                 | the presentation,   |            | document  |
+    |                 | either individually |            |           |
+    |                 | or through standing |            |           |
+    |                 | consent.            |            |           |
+    +-----------------+---------------------+------------+-----------+
+    | human-verified  | A human completed a | IETF       | This      |
+    |                 | user verification   |            | document  |
+    |                 | interaction when    |            |           |
+    |                 | the evidence was    |            |           |
+    |                 | generated.          |            |           |
+    +-----------------+---------------------+------------+-----------+
+    | subject-present | The human subject   | IETF       | This      |
+    |                 | claimed as unique   |            | document  |
+    |                 | participated when   |            |           |
+    |                 | the evidence was    |            |           |
+    |                 | generated.          |            |           |
+    +-----------------+---------------------+------------+-----------+
+
+                                 Table 3
+
+22.  Examples
+
+22.1.  Challenge Reuse for a Request-Scoped Policy
+
+   For a GET request to:
+
+   https://service.example/api/quota
+
+   The origin challenges on the response to the first request:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   HTTP/1.1 429 Too Many Requests
+   Content-Type: application/problem+json
+   Cache-Control: no-store
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="api_quota_group"; \
+     challenge=:u5ytp8jYXgfXmZKNrsllkJt2MH8sWQHIi5UJYyI+VFc=:
+
+   The client retries with a presentation bound to the challenge nonce:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   GET /api/quota HTTP/1.1
+   Host: service.example
+   Human-Continuity: "com.example.unique-human.v1"; \
+     artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
+     purpose="api_quota_group"
+
+   With the Policy Metadata example below, GET /api/quota selects the
+   following effective policy identifier:
+
+   quota
+
+   The effective attestation audience is the canonical HTTPS origin:
+
+   https://service.example
+
+   The purpose is:
+
+   api_quota_group
+
+   The effective realm is:
+
+   https://realm.example
+
+   The continuity scope is:
+
+   (https://realm.example, https://service.example, api_quota_group)
+
+   The policy is selected from the GET /api/quota request context, while
+   the artifact is bound to the canonical HTTPS origin as its
+   attestation audience.  This example assumes that the selected profile
+   permits reuse of the same presentation material.  Under window
+   acceptance, the client resends it until the origin challenges again
+   (Section 11.3).
+
+22.2.  Holder-Bound Presentation
+
+   For a POST request to:
+
+   https://service.example/accounts/free-tier
+
+   The origin can return:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   HTTP/1.1 409 Conflict
+   Content-Type: application/problem+json
+   Cache-Control: no-store
+   Human-Continuity-Challenge: "com.example.unique-human.v1"; \
+     purpose="free_tier_signup"; \
+     challenge=:nI+HKqYqT858msAv9vvZDqe/x5JOABxh0uO7aMJtM0Y=:; \
+     presentation-assurance="subject-present"
+
+   The origin sends this challenge before creating the account,
+   allocating the free tier, or applying any other signup effect.  The
+   client then checks policy metadata before treating the purpose,
+   profile, and presentation-assurance value as authorized.  With the
+   Policy Metadata example below, POST /accounts/free-tier selects the
+   signup policy, which authorizes the challenge.  The client can then
+   repeat the not-yet-applied signup operation with a holder-bound
+   presentation:
+
+   NOTE: '\' line wrapping per RFC 8792
+
+   POST /accounts/free-tier HTTP/1.1
+   Host: service.example
+   Authorization: Bearer account-native-token
+   Content-Type: application/json
+   Content-Digest: sha-256=:07X+4wcYcvreux20N5iVZsZqskk\
+     ynpoTaTbHd8Oufgc=:
+   Human-Continuity: "com.example.unique-human.v1"; \
+     artifact=:ZXhhbXBsZS1hcnRpZmFjdA==:; \
+     purpose="free_tier_signup"; \
+     presentation-assurance="subject-present"
+   Signature-Input: hu=("@method" "@target-uri" \
+     "human-continuity";sf "content-digest");created=1778480000;\
+     expires=1778480060;\
+     keyid="urn:ietf:params:oauth:jwk-thumbprint:sha-256:1IG2tMH7J2wbJZ\
+     nOf8LJzQitKf7LMvoAElsuDMVM54Y";alg="ed25519";tag="human-continuity"
+   Signature: hu=:DohOIdStKJj731Yk4BdjDWOxctbp7v00WLXYWrIc8Ryi/WsDT+7Ri\
+     TXTU+U6Fa6aOUFYF83ZTHBSMX1N0Q4MCQ==:
+
+   The challenge above carried a challenge nonce.  The challenge nonce
+   evidence required by Section 11.3 is carried inside the artifact
+   according to the example profile; it does not appear as a Signature-
+   Input parameter.
+
+22.3.  Policy Metadata
+
+   {
+     "origin": "https://service.example",
+     "default_policy_selectors": {
+       "GET": "site",
+       "HEAD": "site"
+     },
+     "policy_selectors": {
+       "GET": {
+         "/api/quota": "quota"
+       },
+       "HEAD": {
+         "/api/quota": "quota"
+       },
+       "POST": {
+         "/accounts/free-tier": "signup"
+       }
+     },
+     "policies": {
+       "site": {
+         "purposes": {
+           "site_rate_limit": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {}
+             }
+           }
+         }
+       },
+       "signup": {
+         "purposes": {
+           "free_tier_signup": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {
+                 "presentation_assurances": ["subject-present"]
+               }
+             }
+           }
+         }
+       },
+       "quota": {
+         "purposes": {
+           "api_quota_group": {
+             "realm": "https://realm.example",
+             "profiles": {
+               "com.example.unique-human.v1": {}
+             }
+           }
+         }
+       }
+     }
+   }
+
+22.4.  Realm Metadata
+
+   In this non-normative example, verification_key_uri and
+   revocation_status_uri are members defined by the example profile, not
+   by this document.  The members defined by this document are realm and
+   profiles, and within each realm profile entry, issuance_endpoint and
+   max_artifact_size_issued.
+
+   {
+     "realm": "https://realm.example",
+     "profiles": {
+       "com.example.unique-human.v1": {
+         "issuance_endpoint": "https://realm.example/issue",
+         "verification_key_uri": "https://realm.example/keys.json",
+         "revocation_status_uri": "https://realm.example/status",
+         "max_artifact_size_issued": 3072
+       }
+     }
+   }
+
+22.5.  Realm Metadata Without JWKs
+
+   This non-normative example shows realm metadata for two profiles
+   whose verification material is not a JWK Set. The members other than
+   issuance_endpoint and max_artifact_size_issued are profile-defined
+   and illustrative only.
+
+   {
+     "realm": "https://realm.example",
+     "profiles": {
+       "org.example.zk-human.v1": {
+         "issuance_endpoint": "https://realm.example/issue-zk",
+         "verification_key_uri": "https://realm.example/vk.json",
+         "circuit_id": "unique-human-v1",
+         "max_artifact_size_issued": 8192
+       },
+       "org.example.onchain-human.v1": {
+         "chain_id": "eip155:999999999",
+         "verifier_contract":
+           "0x1111111111111111111111111111111111111111",
+         "verification_method": "verify",
+         "root_source": "profile-defined",
+         "max_artifact_size_issued": 4096
+       }
+     }
+   }
+
+22.6.  Using Verifier Output in Origin Policy
+
+   A successful verification result is shown in the example in
+   Section 13.
+
+   For one-human-one-account enforcement, an origin can apply a
+   uniqueness constraint over the verifier-visible scope:
+
+   UNIQUE (
+     realm,
+     attestation_audience,
+     purpose,
+     stored_continuity_handle
+   )
+
+   stored_continuity_handle is policy state, not an authenticator.  It
+   can be the raw continuity_handle or, preferably for persistent
+   storage, a verifier-local protected derivative.  Account access still
+   depends on the origin's native authentication and authorization
+   mechanisms.
+
+23.  References
+
+23.1.  Normative References
+
+   [BCP14]    Best Current Practice 14,
+              <https://www.rfc-editor.org/info/bcp14>.
+              At the time of writing, this BCP comprises the following:
+
+              Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+              Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+   [RFC6454]  Barth, A., "The Web Origin Concept", RFC 6454,
+              DOI 10.17487/RFC6454, December 2011,
+              <https://www.rfc-editor.org/rfc/rfc6454>.
+
+   [RFC7638]  Jones, M. and N. Sakimura, "JSON Web Key (JWK)
+              Thumbprint", RFC 7638, DOI 10.17487/RFC7638, September
+              2015, <https://www.rfc-editor.org/rfc/rfc7638>.
+
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+   [RFC8615]  Nottingham, M., "Well-Known Uniform Resource Identifiers
+              (URIs)", RFC 8615, DOI 10.17487/RFC8615, May 2019,
+              <https://www.rfc-editor.org/rfc/rfc8615>.
+
+   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Semantics", STD 97, RFC 9110,
+              DOI 10.17487/RFC9110, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9110>.
+
+   [RFC9111]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Caching", STD 98, RFC 9111,
+              DOI 10.17487/RFC9111, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9111>.
+
+   [RFC9421]  Backman, A., Ed., Richer, J., Ed., and M. Sporny, "HTTP
+              Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
+              February 2024, <https://www.rfc-editor.org/rfc/rfc9421>.
+
+   [RFC9530]  Polli, R. and L. Pardue, "Digest Fields", RFC 9530,
+              DOI 10.17487/RFC9530, February 2024,
+              <https://www.rfc-editor.org/rfc/rfc9530>.
+
+   [RFC9651]  Nottingham, M. and P. Kamp, "Structured Field Values for
+              HTTP", RFC 9651, DOI 10.17487/RFC9651, September 2024,
+              <https://www.rfc-editor.org/rfc/rfc9651>.
+
+23.2.  Informative References
+
+   [DC-API]   W3C Federated Identity Working Group, "Digital Credentials
+              API", July 2026,
+              <https://www.w3.org/TR/digital-credentials/>.
+
+   [I-D.irtf-cfrg-bbs-per-verifier-linkability]
+              Kalos, V. and G. M. Bernstein, "BBS per Verifier
+              Linkability", Work in Progress, Internet-Draft, draft-
+              irtf-cfrg-bbs-per-verifier-linkability-03, 29 June 2026,
+              <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
+              bbs-per-verifier-linkability-03>.
+
+   [I-D.jms-mole-architecture]
+              Schlesinger, S., Jackson, D., and T. Meunier, "Moderation
+              of unLinkable Endorsements (MoLE) Architecture", Work in
+              Progress, Internet-Draft, draft-jms-mole-architecture-00,
+              6 July 2026, <https://datatracker.ietf.org/doc/html/draft-
+              jms-mole-architecture-00>.
+
+   [I-D.meunier-webbotauth-httpsig-protocol]
+              Meunier, T. and S. Major, "HTTP Message Signatures for
+              automated traffic", Work in Progress, Internet-Draft,
+              draft-meunier-webbotauth-httpsig-protocol-01, 5 August
+              2026, <https://datatracker.ietf.org/doc/html/draft-
+              meunier-webbotauth-httpsig-protocol-01>.
+
+   [I-D.meunier-webbotauth-registry]
+              Guerreiro, M., Kirazci, U., and T. Meunier, "Registry and
+              Signature Agent card for Web bot auth", Work in Progress,
+              Internet-Draft, draft-meunier-webbotauth-registry-03, 26
+              June 2026, <https://datatracker.ietf.org/doc/html/draft-
+              meunier-webbotauth-registry-03>.
+
+   [I-D.schlesinger-cfrg-act]
+              Schlesinger, S. and J. Katz, "Anonymous Credit Tokens",
+              Work in Progress, Internet-Draft, draft-schlesinger-cfrg-
+              act-01, 13 February 2026,
+              <https://datatracker.ietf.org/doc/html/draft-schlesinger-
+              cfrg-act-01>.
+
+   [OpenID4VP]
+              OpenID Foundation, "OpenID for Verifiable Presentations
+              1.0", July 2025, <https://openid.net/specs/openid-4-
+              verifiable-presentations-1_0.html>.
+
+   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+              Morris, J., Hansen, M., and R. Smith, "Privacy
+              Considerations for Internet Protocols", RFC 6973,
+              DOI 10.17487/RFC6973, July 2013,
+              <https://www.rfc-editor.org/rfc/rfc6973>.
+
+   [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
+              DOI 10.17487/RFC7517, May 2015,
+              <https://www.rfc-editor.org/rfc/rfc7517>.
+
+   [RFC7800]  Jones, M., Bradley, J., and H. Tschofenig, "Proof-of-
+              Possession Key Semantics for JSON Web Tokens (JWTs)",
+              RFC 7800, DOI 10.17487/RFC7800, April 2016,
+              <https://www.rfc-editor.org/rfc/rfc7800>.
+
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+              "Handling Long Lines in Content of Internet-Drafts and
+              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+              <https://www.rfc-editor.org/rfc/rfc8792>.
+
+   [RFC9278]  Jones, M. and K. Yasuda, "JWK Thumbprint URI", RFC 9278,
+              DOI 10.17487/RFC9278, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9278>.
+
+   [RFC9334]  Birkholz, H., Thaler, D., Richardson, M., Smith, N., and
+              W. Pan, "Remote ATtestation procedureS (RATS)
+              Architecture", RFC 9334, DOI 10.17487/RFC9334, January
+              2023, <https://www.rfc-editor.org/rfc/rfc9334>.
+
+   [RFC9457]  Nottingham, M., Wilde, E., and S. Dalal, "Problem Details
+              for HTTP APIs", RFC 9457, DOI 10.17487/RFC9457, July 2023,
+              <https://www.rfc-editor.org/rfc/rfc9457>.
+
+   [RFC9576]  Davidson, A., Iyengar, J., and C. A. Wood, "The Privacy
+              Pass Architecture", RFC 9576, DOI 10.17487/RFC9576, June
+              2024, <https://www.rfc-editor.org/rfc/rfc9576>.
+
+   [RFC9577]  Pauly, T., Valdez, S., and C. A. Wood, "The Privacy Pass
+              HTTP Authentication Scheme", RFC 9577,
+              DOI 10.17487/RFC9577, June 2024,
+              <https://www.rfc-editor.org/rfc/rfc9577>.
+
+   [RFC9728]  Jones, M.B., Hunt, P., and A. Parecki, "OAuth 2.0
+              Protected Resource Metadata", RFC 9728,
+              DOI 10.17487/RFC9728, April 2025,
+              <https://www.rfc-editor.org/rfc/rfc9728>.
+
+   [X401]     Proof and Circle, "x401, Version 0.2.0 (Draft)", 27 June
+              2026, <https://github.com/proof/x401/
+              blob/3f73cf912cd05a40bf8de3fe6c1f4bb720341336/spec.md>.
+
+Appendix A.  Open Issues
+
+   RFC Editor: Please remove this section before publication.
+
+   The following issues are intentionally left for discussion:
+
+   1.  Whether future revisions should add path template matching or
+       keep only exact and terminal subtree path patterns.
+
+   2.  Whether purpose templates need additional privacy constraints or
+       richer matching syntax beyond exact string prefixes.
+
+   3.  Whether clients should learn the challenge acceptance mode or
+       validity interval.
+
+   4.  Clock skew defaults for browser, mobile, embedded, and agent
+       deployments.
+
+   5.  Whether future revisions should use Accept-Signature for dynamic
+       covered component negotiation.
+
+   6.  Whether one or more companion profile drafts should be published
+       with this document to demonstrate interoperability across
+       independent realm operator designs.
+
+   7.  Whether future revisions should introduce attestation audiences
+       other than the canonical HTTPS origin of the request, either
+       same-origin audiences narrowed within an origin at issuance time,
+       or delegated cross-origin audiences, and under what rules for
+       realm visibility and delegation trust.
+
+Acknowledgements
+
+   This document is informed by prior work on HTTP Structured Fields,
+   HTTP Message Signatures, well-known metadata, OAuth 2.0 Protected
+   Resource Metadata, and Privacy Pass.  The editor thanks the authors
+   and contributors of those specifications.
+
+Author's Address
+
+   Aurélien Brézun
+   Tools for Humanity
+   Email: aurelien.brezun@toolsforhumanity.com
