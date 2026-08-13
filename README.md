@@ -14,10 +14,9 @@ This is the working area for the individual Internet-Draft, "Human Continuity fo
 The following are informative and are not part of the protocol contract. Where
 they disagree with the draft's normative prose, the prose prevails.
 
-- [`docs/applicability-rationale.md`](docs/applicability-rationale.md) explains
-  why a scoped, verifier-local continuity handle is the minimal primitive for
-  mutable per-human allocation, and when an unlinkable mechanism or
-  operator-mediated allocation is the better choice instead.
+- [`docs/problem-statement.md`](docs/problem-statement.md) describes the need to
+  recognize the same person again, what a scoped verifier-local pseudonym
+  provides, and when an unlinkable mechanism is preferable.
 - [`schemas/`](schemas/) holds JSON Schemas for the policy metadata and realm
   metadata documents. Every metadata example in the draft is validated against
   them in CI:
