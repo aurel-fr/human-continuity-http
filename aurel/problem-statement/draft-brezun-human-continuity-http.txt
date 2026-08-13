@@ -2033,10 +2033,9 @@ Table of Contents
    verification result for a conforming profile MUST include a verifier-
    local continuity_handle.
 
-   While a verified human remains eligible and retains the state
-   required by a profile, the profile MUST support repeated valid
-   presentations by that human within the same continuity scope,
-   including presentations bound to different valid challenge nonces.  A
+   A profile MUST support repeated valid presentations by the same
+   verified human within the same continuity scope, including
+   presentations bound to different valid challenge nonces.  A
    successful presentation MUST NOT itself terminate that capability.
 
    The continuity_handle MUST be opaque and canonically encoded.  Under
