@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                          13 August 2026
-Expires: 14 February 2027
+Intended status: Standards Track                          14 August 2026
+Expires: 15 February 2027
 
 
                        Human Continuity for HTTP
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 February 2027.
+   This Internet-Draft will expire on 15 February 2027.
 
 Copyright Notice
 
@@ -2034,9 +2034,9 @@ Table of Contents
    local continuity_handle.
 
    A profile MUST support repeated valid presentations by the same
-   verified human within the same continuity scope, including
-   presentations bound to different valid challenge nonces.  A
-   successful presentation MUST NOT itself terminate that capability.
+   verified human within the same continuity scope - including
+   presentations bound to different valid challenge nonces - without a
+   successful presentation itself terminating that capability.
 
    The continuity_handle MUST be opaque and canonically encoded.  Under
    the profile's documented assumptions, prediction, preimage, and
