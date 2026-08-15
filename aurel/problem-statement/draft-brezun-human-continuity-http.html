@@ -1051,7 +1051,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Brezun</td>
-<td class="center">Expires 15 February 2027</td>
+<td class="center">Expires 16 February 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg {
 <dd class="internet-draft">draft-brezun-human-continuity-http-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-14" class="published">14 August 2026</time>
+<time datetime="2026-08-15" class="published">15 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-15">15 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-02-16">16 February 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ svg {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1481,7 +1481,7 @@ svg {
         </h3>
 <p id="section-1.2-1">This specification is intended for origins that require verifier-local human continuity within a declared continuity scope. A successful presentation intentionally allows the verifier to determine that repeated presentations within the same <code>(realm, attestation audience, purpose)</code> tuple are backed by the same verified unique human, without requiring a global human identifier.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 <p id="section-1.2-2">Origins <span class="bcp14">SHOULD NOT</span> request <code>Human-Continuity</code> when an unlinkable authorization, redemption, or credit-spend mechanism is sufficient.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
-<p id="section-1.2-3">The boundary between this specification and unlinkable mechanisms is whether the origin must recognize the same person across separate permitted events. Unlinkable mechanisms can enforce one-shot rules and fixed or mutable allowances using artifact-bound, credential-bound, or system-held state, such as a registry-side nullifier store, without giving the origin a stable handle across those events. MoLE <span>[<a href="#I-D.jms-mole-architecture" class="cite xref">I-D.jms-mole-architecture</a>]</span> tests and updates hidden credential state while keeping presentations unlinkable. ACT <span>[<a href="#I-D.schlesinger-cfrg-act" class="cite xref">I-D.schlesinger-cfrg-act</a>]</span> lets a client prove a spend against a hidden token balance and construct an unlinkable replacement token for the remaining balance. Privacy Pass <span>[<a href="#RFC9576" class="cite xref">RFC9576</a>]</span> instead uses token redemption. Its HTTP authentication scheme <span>[<a href="#RFC9577" class="cite xref">RFC9577</a>]</span> defines token verification and recommends preventing the same token nonce from being redeemed twice, while permitting replay-tolerant uses.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+<p id="section-1.2-3">The boundary between this specification and unlinkable mechanisms is whether the origin must recognize the same person across separate permitted events. Unlinkable mechanisms can enforce one-shot rules and fixed or mutable allowances using artifact-bound, credential-bound, or system-held state, such as a registry-side nullifier store, without giving the origin a stable handle across those events. MoLE <span>[<a href="#I-D.jms-mole-architecture" class="cite xref">I-D.jms-mole-architecture</a>]</span> tests and updates hidden credential state while keeping presentations unlinkable. ACT <span>[<a href="#I-D.schlesinger-cfrg-act" class="cite xref">I-D.schlesinger-cfrg-act</a>]</span> lets a client prove a spend against a hidden token balance and construct an unlinkable replacement token for the remaining balance. Privacy Pass <span>[<a href="#RFC9576" class="cite xref">RFC9576</a>]</span> instead uses token redemption.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
 <p id="section-1.2-4"><code>Human-Continuity</code> instead provides the origin with a stable, scope-local pseudonym at decision time: the <code>continuity_handle</code>. The verifier can associate mutable state with that handle and recognize that a presentation is backed by the same verified unique human as an earlier presentation in the same declared continuity scope. <code>Human-Continuity</code> addresses the case in which the origin must recognize the same person again to apply, review, or revise a rule for that person. Use cases that may require this recognition include duplicate account prevention, per-human quota grouping across accounts or sessions, Sybil-resistant participation, recovery-sensitive account workflows, grant or trial credit claims that require human continuity, and agent delegation policies that group activity by the backing human.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
 <p id="section-1.2-5">Unlinkable mechanisms that rely on client-retained tokens, credentials, or balances can suit short-lived or single-device use but be less suitable for long-lived, multi-device, or recoverable continuity. Support for those properties in this framework depends on the selected profile's state, recovery, and device continuity model (<a href="#profile-requirements" class="auto internal xref">Section 10</a>), increases privacy risk, and requires narrow continuity scopes.<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 <p id="section-1.2-6">A credential presentation alone shows that the subject holds a qualifying credential at presentation time. If that check suffices, a presentation protocol without this document is preferable.<a href="#section-1.2-6" class="pilcrow">¶</a></p>

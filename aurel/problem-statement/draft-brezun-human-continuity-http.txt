@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                          14 August 2026
-Expires: 15 February 2027
+Intended status: Standards Track                          15 August 2026
+Expires: 16 February 2027
 
 
                        Human Continuity for HTTP
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 February 2027.
+   This Internet-Draft will expire on 16 February 2027.
 
 Copyright Notice
 
@@ -339,9 +339,7 @@ Table of Contents
    [I-D.schlesinger-cfrg-act] lets a client prove a spend against a
    hidden token balance and construct an unlinkable replacement token
    for the remaining balance.  Privacy Pass [RFC9576] instead uses token
-   redemption.  Its HTTP authentication scheme [RFC9577] defines token
-   verification and recommends preventing the same token nonce from
-   being redeemed twice, while permitting replay-tolerant uses.
+   redemption.
 
    Human-Continuity instead provides the origin with a stable, scope-
    local pseudonym at decision time: the continuity_handle.  The
