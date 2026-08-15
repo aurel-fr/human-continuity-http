@@ -4,8 +4,8 @@
 
 Network Working Group                                          A. Brezun
 Internet-Draft                                        Tools for Humanity
-Intended status: Standards Track                          12 August 2026
-Expires: 13 February 2027
+Intended status: Standards Track                          15 August 2026
+Expires: 16 February 2027
 
 
                        Human Continuity for HTTP
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 February 2027.
+   This Internet-Draft will expire on 16 February 2027.
 
 Copyright Notice
 
@@ -328,34 +328,31 @@ Table of Contents
    Origins SHOULD NOT request Human-Continuity when an unlinkable
    authorization, redemption, or credit-spend mechanism is sufficient.
 
-   The boundary between this specification and unlinkable mechanisms
-   turns on where policy state lives and when policy is applied.
-   Unlinkable capability systems fix a spendable allowance at issuance
-   and decide each redemption against the artifact rather than the
-   human.  Privacy Pass [RFC9576], the Privacy Pass HTTP authentication
-   scheme [RFC9577], and ACT [I-D.schlesinger-cfrg-act] issue tokens or
-   credits.  At redemption time, the verifier asks only whether the
-   bearer presents a still-valid, not-yet-exhausted capability: that the
-   client is authorized to proceed, has satisfied an issuance
-   precondition such as solving a CAPTCHA, holds a spendable token or
-   credit, or has not double-spent it.
+   The boundary between this specification and unlinkable mechanisms is
+   whether the origin must recognize the same person across separate
+   permitted events.  Unlinkable mechanisms can enforce one-shot rules
+   and fixed or mutable allowances using artifact-bound, credential-
+   bound, or system-held state, such as a registry-side nullifier store,
+   without giving the origin a stable handle across those events.  MoLE
+   [I-D.jms-mole-architecture] tests and updates hidden credential state
+   while keeping presentations unlinkable.  ACT
+   [I-D.schlesinger-cfrg-act] lets a client prove a spend against a
+   hidden token balance and construct an unlinkable replacement token
+   for the remaining balance.  Privacy Pass [RFC9576] instead uses token
+   redemption.
 
-   Human-Continuity instead allows policy to bind at decision time.  The
-   verifier can use mutable per-human state keyed by the resulting
-   continuity_handle to recognize that a presentation is backed by the
-   same verified unique human as an earlier presentation in the same
-   declared continuity scope.  That recognition is needed when a per-
-   human rule may be applied, audited, or revised after artifacts are
-   already in use.  An unlinkable mechanism cannot express such a rule
-   because it cannot distinguish repeated use by one human from use by
-   several.  Examples include duplicate account prevention, per-human
-   quota grouping across accounts or sessions, Sybil-resistant
-   participation, recovery-sensitive account workflows, grant or trial
-   credit claims that require human continuity, and agent delegation
-   policies that group activity by the backing human.  For use cases
-   involving allocation or abuse control, a scoped continuity_handle
-   does not eliminate abuse; it changes the attacker's bottleneck from
-   creating accounts to obtaining access to distinct verified humans.
+   Human-Continuity instead provides the origin with a stable, scope-
+   local pseudonym at decision time: the continuity_handle.  The
+   verifier can associate mutable state with that handle and recognize
+   that a presentation is backed by the same verified unique human as an
+   earlier presentation in the same declared continuity scope.  Human-
+   Continuity addresses the case in which the origin must recognize the
+   same person again to apply, review, or revise a rule for that person.
+   Use cases that may require this recognition include duplicate account
+   prevention, per-human quota grouping across accounts or sessions,
+   Sybil-resistant participation, recovery-sensitive account workflows,
+   grant or trial credit claims that require human continuity, and agent
+   delegation policies that group activity by the backing human.
 
    Unlinkable mechanisms that rely on client-retained tokens,
    credentials, or balances can suit short-lived or single-device use
@@ -380,6 +377,10 @@ Table of Contents
    (Section 10.3).  After loss of client state, the selected profile
    defines whether another valid presentation remains possible; if so,
    it produces the same scoped handle (Section 10).
+
+   For allocation or abuse-control uses, a scoped continuity_handle does
+   not eliminate abuse; it changes the attacker's bottleneck from
+   creating accounts to obtaining access to distinct verified humans.
 
 2.  Conventions and Terminology
 
@@ -2030,6 +2031,11 @@ Table of Contents
    verification result for a conforming profile MUST include a verifier-
    local continuity_handle.
 
+   A profile MUST support repeated valid presentations by the same
+   verified human within the same continuity scope - including
+   presentations bound to different valid challenge nonces - without a
+   successful presentation itself terminating that capability.
+
    The continuity_handle MUST be opaque and canonically encoded.  Under
    the profile's documented assumptions, prediction, preimage, and
    second-preimage resistance MUST be at least 112 bits and SHOULD be at
@@ -2814,10 +2820,10 @@ Table of Contents
    and handles are infeasible to reverse or enumerate outside their
    scope, so the protocol does not by itself tie a handle to a real-
    world or account identity.  Within a scope a handle still singles out
-   the same human and can be personal data; an origin that joins it to
-   identifying data it already holds performs that identification, which
-   the retention, deletion, and access control guidance above is meant
-   to constrain.
+   the same human and can be personal data; an origin that associates it
+   with identifying data it already holds performs that identification,
+   which the retention, deletion, and access control guidance above is
+   meant to constrain.
 
    Secondary use (Section 5.2.3 of [RFC6973]): Purpose binds each
    artifact and continuity_handle to the context it was authorized for,
@@ -3477,6 +3483,13 @@ Table of Contents
               irtf-cfrg-bbs-per-verifier-linkability-03, 29 June 2026,
               <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
               bbs-per-verifier-linkability-03>.
+
+   [I-D.jms-mole-architecture]
+              Schlesinger, S., Jackson, D., and T. Meunier, "Moderation
+              of unLinkable Endorsements (MoLE) Architecture", Work in
+              Progress, Internet-Draft, draft-jms-mole-architecture-00,
+              6 July 2026, <https://datatracker.ietf.org/doc/html/draft-
+              jms-mole-architecture-00>.
 
    [I-D.meunier-webbotauth-httpsig-protocol]
               Meunier, T. and S. Major, "HTTP Message Signatures for
