@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-13T01:46:26.413905+00:00",
+  "timestamp": "2026-08-16T01:08:55.011290+00:00",
   "repo": "aurel-fr/human-continuity-http",
   "labels": [
     {
@@ -364,6 +364,48 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOTuLynM7_WAcD",
+      "title": "docs: problem statement",
+      "url": "https://github.com/aurel-fr/human-continuity-http/pull/14",
+      "state": "MERGED",
+      "author": "aurel-fr",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-15T00:05:03Z",
+      "updatedAt": "2026-08-15T00:29:13Z",
+      "baseRepository": "aurel-fr/human-continuity-http",
+      "baseRefName": "main",
+      "baseRefOid": "bbfcd042aa02e5e6b261a23d907685e1a5133049",
+      "headRepository": "aurel-fr/human-continuity-http",
+      "headRefName": "aurel/problem-statement",
+      "headRefOid": "a40663652a7f70e92c5bf0438dae6372425544b7",
+      "closedAt": "2026-08-15T00:27:42Z",
+      "mergedAt": "2026-08-15T00:27:42Z",
+      "mergedBy": "aurel-fr",
+      "mergeCommit": {
+        "oid": "01744df3581804622c14daaa3cedaad44a10c378"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTuLynM8AAAABJpHgBA",
+          "commit": {
+            "abbreviatedOid": "a406636"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "## Pull request overview\n\nClarifies why services may need scoped human continuity and distinguishes it from unlinkable mechanisms.\n\n**Changes:**\n- Adds a standalone problem statement with deployment examples.\n- Refines applicability guidance and references MoLE.\n- Requires profiles to support repeated presentations across challenge nonces.\n\n### Reviewed changes\n\nCopilot reviewed 4 out of 4 changed files in this pull request and generated no comments.\n\n| File | Description |\n| ---- | ----------- |\n| `README.md` | Links the new problem statement. |\n| `draft-brezun-human-continuity-http.md` | Refines applicability and profile requirements. |\n| `docs/problem-statement.md` | Adds supporting rationale and examples. |\n| `docs/applicability-rationale.md` | Removes the superseded rationale. |\n\n\n\n\n\n\n\n---\n\n\ud83d\udca1 <a href=\"/aurel-fr/human-continuity-http/new/main?filename=.github/skills/code-review/SKILL.md\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Add a `code-review` agent skill</a> or configure MCP servers for context-aware, tailored reviews. <a href=\"https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review#mcp-servers-and-agent-skills\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Learn more in the docs.</a>",
+          "createdAt": "2026-08-15T00:13:46Z",
+          "updatedAt": "2026-08-15T00:13:46Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
